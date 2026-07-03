@@ -10,6 +10,10 @@ public class MatchService {
     MatchRepository matchRepository = new MatchRepository();
     TournamentRepository tournamentRepository = new TournamentRepository();
 
+    public Match criar(Match match){
+        return matchRepository.criar(match);
+    }
+
     public Match buscarPorId(Long id){
         Match m = matchRepository.buscarPorId(id);
         if (m == null) {
@@ -28,6 +32,21 @@ public class MatchService {
 
     public void atualizarStatus(String status, Long id){
         matchRepository.atualizarStatus(status, id);
+    }
+
+    public void atualizarPlayer1(Long id, Long fk_player1_id){
+        buscarPorId(id);
+        matchRepository.atualizarPlayer1(id, fk_player1_id);
+    }
+
+    public void atualizarPlayer2(Long id, Long fk_player2_id){
+        buscarPorId(id);
+        matchRepository.atualizarPlayer2(id, fk_player2_id);
+    }
+
+    public void atualizarVencedor(long id, Long fk_winner_id, Integer score_player1, Integer score_player2){
+        buscarPorId(id);
+        matchRepository.atualizarVencedor(id, fk_winner_id, score_player1, score_player2);
     }
 
     public Match registrarResultado(Long id, Long fk_winner_id, Integer score_player1, Integer score_player2){
