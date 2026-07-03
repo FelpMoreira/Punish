@@ -7,11 +7,14 @@ import java.util.List;
 
 import com.punish.Model.Match;
 import com.punish.Model.Player;
-import com.punish.Repository.MatchRepository;
 
 public class BracketService {
 
-    MatchRepository matchRepository = new MatchRepository();
+    MatchService matchService;
+
+    public BracketService(MatchService matchService) {
+        this.matchService = matchService;
+    }
     
     private int calcularTamanhoBracket(int numJogadores){
         int tamanho = 1;
@@ -47,7 +50,7 @@ public class BracketService {
                 match.setMatch_number(p);
                 match.setBracket_type("WINNERS");
                 match.setStatus("WAITING");
-                Match matchSalvo = matchRepository.criar(match);
+                Match matchSalvo = matchService.criar(match);
                 matches.add(matchSalvo);
             }
         }
@@ -58,7 +61,7 @@ public class BracketService {
                          .orElse(null);
             if (prox != null) {
                 match.setFk_next_match_win_id(prox.getId());
-                matchRepository.atualizarNextMatchWin(match.getFk_next_match_win_id(), match.getId());
+                matchService.atualizarNextMatchWin(match.getFk_next_match_win_id(), match.getId());
             }
         }
 
@@ -72,41 +75,41 @@ public class BracketService {
             Player p2 = slots.get(indice++);
 
             if (p1 != null && p2 != null) {
-                matchRepository.atualizarPlayer1(match.getId(), p1.getId());
-                matchRepository.atualizarPlayer2(match.getId(), p2.getId());
-                matchRepository.atualizarStatus("READY", match.getId());
+                matchService.atualizarPlayer2(match.getId(), p2.getId());
+                matchService.atualizarStatus("READY", match.getId());
+                matchService.atualizarPlayer1(match.getId(), p1.getId());
             } else if (p1 == null){
-                matchRepository.atualizarPlayer2(match.getId(), p2.getId());
-                matchRepository.atualizarVencedor(match.getId(), p2.getId(), 0, 0);
-                matchRepository.atualizarStatus("FINISHED", match.getId());
+                matchService.atualizarPlayer2(match.getId(), p2.getId());
+                matchService.atualizarVencedor(match.getId(), p2.getId(), 0, 0);
+                matchService.atualizarStatus("FINISHED", match.getId());
                 Match prox = matches.stream()
                              .filter(m -> m.getId().equals(match.getFk_next_match_win_id()))
                              .findFirst()
                              .orElse(null);
                 if (prox.getFk_player1_id() == null) {
-                    matchRepository.atualizarPlayer2(prox.getId(), p2.getId());
+                    matchService.atualizarPlayer2(prox.getId(), p2.getId());
                     prox.setFk_player2_id(p2.getId());
                 } else {
-                    matchRepository.atualizarPlayer1(prox.getId(), p2.getId());
+                    matchService.atualizarPlayer1(prox.getId(), p2.getId());
                     prox.setFk_player1_id(p2.getId());
                 }
             } else if (p2 == null){
-                matchRepository.atualizarPlayer1(match.getId(), p1.getId());
-                matchRepository.atualizarVencedor(match.getId(), p1.getId(), 0,0);
-                matchRepository.atualizarStatus("FINISHED", match.getId());
+                matchService.atualizarPlayer1(match.getId(), p1.getId());
+                matchService.atualizarVencedor(match.getId(), p1.getId(), 0,0);
+                matchService.atualizarStatus("FINISHED", match.getId());
                 Match prox = matches.stream()
                              .filter(m -> m.getId().equals(match.getFk_next_match_win_id()))
                              .findFirst()
                              .orElse(null);
                 if (prox.getFk_player1_id() == null) {
-                    matchRepository.atualizarPlayer1(prox.getId(), p1.getId());
+                    matchService.atualizarPlayer1(prox.getId(), p1.getId());
                     prox.setFk_player1_id(p1.getId());
                 } else {
-                    matchRepository.atualizarPlayer2(prox.getId(), p1.getId());
+                    matchService.atualizarPlayer2(prox.getId(), p1.getId());
                     prox.setFk_player2_id(p1.getId());
                 }
             } else {
-                matchRepository.atualizarStatus("FINISHED", match.getId());
+                matchService.atualizarStatus("FINISHED", match.getId());
             }
         }
 
@@ -122,7 +125,7 @@ public class BracketService {
 
             if (winner != null) continue;
             if (p1 != null && p2 != null) {
-                matchRepository.atualizarStatus("READY", match.getId());
+                matchService.atualizarStatus("READY", match.getId());
             }
         }
 

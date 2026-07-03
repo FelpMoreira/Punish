@@ -8,6 +8,7 @@ import com.punish.Service.TournamentService;
 import com.punish.Model.Match;
 import com.punish.Model.Player;
 import com.punish.Service.BracketService;
+import com.punish.Service.MatchService;
 import com.punish.Service.PlayerService;
 
 import io.javalin.Javalin;
@@ -15,7 +16,7 @@ import io.javalin.Javalin;
 public class TournamentController {
     TournamentService tournamentService = new TournamentService();
     PlayerService playerService = new PlayerService();
-    BracketService bracketService = new BracketService();
+    BracketService bracketService = new BracketService(new MatchService());
 
     public void tournamentRoutes(Javalin app){
         app.get("/tournaments", ctx -> {
