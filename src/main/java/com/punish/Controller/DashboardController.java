@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.punish.Repository.MatchRepository;
 import com.punish.Repository.PlayerRepository;
-import com.punish.Repository.TournamentRepository;
 
 import io.javalin.Javalin;
 
