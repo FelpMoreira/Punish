@@ -7,9 +7,11 @@ import com.punish.Service.TournamentService;
 
 import com.punish.Model.Match;
 import com.punish.Model.Player;
+import com.punish.Model.Ranking;
 import com.punish.Service.BracketService;
 import com.punish.Service.MatchService;
 import com.punish.Service.PlayerService;
+import com.punish.Service.RankingService;
 
 import io.javalin.Javalin;
 
@@ -17,6 +19,7 @@ public class TournamentController {
     TournamentService tournamentService = new TournamentService();
     PlayerService playerService = new PlayerService();
     BracketService bracketService = new BracketService(new MatchService());
+    RankingService rankingService = new RankingService();
 
     public void tournamentRoutes(Javalin app){
         app.get("/tournaments", ctx -> {
@@ -28,6 +31,12 @@ public class TournamentController {
             Long id = Long.parseLong(ctx.pathParam("id"));
             Tournament t = tournamentService.buscarPorId(id);
             ctx.status(201).json(t);
+        });
+
+        app.get("/tournaments/{id}/ranking", ctx -> {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+            List<Ranking> ranking = rankingService.calcularRanking(id);
+            ctx.json(ranking);
         });
 
         app.post("/tournaments", ctx -> {
