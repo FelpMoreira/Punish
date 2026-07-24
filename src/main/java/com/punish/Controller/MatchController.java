@@ -30,5 +30,11 @@ public class MatchController {
             Match matchAtualizada = matchService.registrarResultado(match_id, body.fk_winner_id(), body.score_player1(), body.score_player2());
             ctx.json(matchAtualizada);
         });
+
+        app.patch("/matches/{id}/start", ctx -> {
+            Long match_id = Long.parseLong(ctx.pathParam("id"));
+            Match m = matchService.iniciarPartida(match_id);
+            ctx.json(m);
+        });
     }
 }
