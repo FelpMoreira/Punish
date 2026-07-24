@@ -1,5 +1,6 @@
 package com.punish.Service;
 
+import java.security.PublicKey;
 import java.util.List;
 
 import com.punish.Model.Match;
@@ -47,6 +48,15 @@ public class MatchService {
     public void atualizarVencedor(long id, Long fk_winner_id, Integer score_player1, Integer score_player2){
         buscarPorId(id);
         matchRepository.atualizarVencedor(id, fk_winner_id, score_player1, score_player2);
+    }
+
+    public Match iniciarPartida(Long id){
+        Match m = matchRepository.buscarPorId(id);
+        if (m == null) throw new RuntimeException("Partida não encontrada");
+        if (!"READY".equals(m.getStatus())) throw new RuntimeException("Partida não pronta");
+        if (m.getFk_player1_id() == null || m.getFk_player2_id() == null) throw new RuntimeException("Partida não tem 2 jogadores");
+        matchRepository.atualizarStatus("IN_PROGRESS", id);
+        return matchRepository.buscarPorId(id);
     }
 
     public Match registrarResultado(Long id, Long fk_winner_id, Integer score_player1, Integer score_player2){
