@@ -2,6 +2,9 @@ package com.punish.Service;
 
 import java.util.List;
 
+import com.punish.Exception.ConflictException;
+import com.punish.Exception.NotFoundException;
+import com.punish.Exception.ValidationException;
 import com.punish.Model.Player;
 import com.punish.Model.Tournament;
 import com.punish.Model.Enums.TournamentStatus;
@@ -14,12 +17,14 @@ public class PlayerService {
     PlayerRepository playerRepository = new PlayerRepository();
 
     public Player criarPlayer(String nickname){
+        if(nickname == null || nickname.isBlank()) throw new ValidationException("Nickname é obrigatório");
+        if(nickname.length() > 50) throw new ValidationException("Nickname muito longo");
         return playerRepository.criarPlayer(nickname);
     }
 
     public Player buscarPorId(Long id){
         Player p = playerRepository.buscarPorId(id);
-        if (p == null) throw new RuntimeException("Player não encontrado");
+        if (p == null) throw new NotFoundException("Player não encontrado");
         return p;
     }
 
@@ -34,14 +39,14 @@ public class PlayerService {
     public void adicionarAoTournament(Long tournament_id, Long player_id){
         Tournament t = tournamentService.buscarPorId(tournament_id);
         if (t.getStatus() != TournamentStatus.CREATED) {
-            throw new RuntimeException("Torneio não está aberto para inscrição");
+            throw new ConflictException("Torneio não está aberto para inscrição");
         }
         buscarPorId(player_id);
         if (tournamentPlayerRepository.existe(tournament_id, player_id)){
-            throw new RuntimeException("Jogador já está no torneio");
+            throw new ConflictException("Jogador já está no torneio");
         }
         if (tournamentPlayerRepository.contarPorTournament(tournament_id) >= 16) {
-            throw new RuntimeException("Torneio cheio");
+            throw new ConflictException("Torneio cheio");
         }
         tournamentPlayerRepository.criarTournamentPlayer(tournament_id, player_id);
     }
@@ -49,7 +54,7 @@ public class PlayerService {
     public void removerPlayersDoTournament(Long tournament_id, Long player_id){
         Tournament t = tournamentService.buscarPorId(tournament_id);
         if (t.getStatus() != TournamentStatus.CREATED) {
-            throw new RuntimeException("Não é possivel remover players");
+            throw new ConflictException("Não é possivel remover players");
         }
         tournamentPlayerRepository.deletarTournamentPlayer(tournament_id, player_id);
     }
