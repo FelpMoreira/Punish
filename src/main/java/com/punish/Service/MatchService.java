@@ -1,5 +1,6 @@
 package com.punish.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.punish.Exception.ConflictException;
@@ -15,6 +16,21 @@ public class MatchService {
 
     public Match criar(Match match){
         return matchRepository.criar(match);
+    }
+
+    public List<Match> iniciarRodada(Long fk_tournament_id, int fk_round_number){
+        List<Match> all = matchRepository.buscarPorTournament(fk_tournament_id);
+        List<Match> started = new ArrayList<>();
+        for (Match m : all) {
+            if (m.getRound_number() == fk_round_number
+                    && "READY".equals(m.getStatus())
+                    && m.getFk_player1_id() != null
+                    && m.getFk_player2_id() != null) {
+                matchRepository.atualizarStatus("IN_PROGRESS", m.getId());
+                started.add(matchRepository.buscarPorId(m.getId()));
+            }
+        }
+        return started;
     }
 
     public Match buscarPorId(Long id){
