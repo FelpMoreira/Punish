@@ -36,5 +36,13 @@ public class MatchController {
             Match m = matchService.iniciarPartida(match_id);
             ctx.json(m);
         });
+
+        app.patch("/tournaments/{id}/matches/start-round", ctx -> {
+            Long tournamentId = Long.parseLong(ctx.pathParam("id"));
+            var body = ctx.bodyAsClass(java.util.Map.class);
+            int round = ((Number) body.get("round")).intValue();
+            var started = matchService.iniciarRodada(tournamentId, round);
+            ctx.json(started);
+        });
     }
 }
