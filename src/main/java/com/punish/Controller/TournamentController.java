@@ -79,6 +79,12 @@ public class TournamentController {
             ctx.status(201).json(matches);
         });
 
+        app.post("/tournaments/{id}/recalculate", ctx -> {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+            tournamentService.recalcularBracket(id);
+            ctx.status(204);
+        });
+
         app.delete("/tournaments/{id}", ctx -> {
             Long id = Long.parseLong(ctx.pathParam("id"));
             tournamentService.deletar(id);
