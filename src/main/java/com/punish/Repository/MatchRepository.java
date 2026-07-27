@@ -44,6 +44,14 @@ public class MatchRepository {
         );
     }
 
+    public void deletarPorTournament(Long fk_tournament_id){
+        jdbi.withHandle(handle ->
+            handle.createUpdate("DELETE FROM matches WHERE fk_tournament_id = :tid")
+            .bind("tid", fk_tournament_id)
+            .execute()
+        );
+    }
+
     public void atualizarVencedor(long id, Long fk_winner_id, Integer score_player1, Integer score_player2){
         jdbi.withHandle(handle -> 
             handle.createUpdate("UPDATE matches SET fk_winner_id = :winnerId, score_player1 = :score1, score_player2 = :score2, status = 'FINISHED' WHERE id = :id")
