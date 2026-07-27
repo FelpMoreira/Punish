@@ -87,6 +87,14 @@ public class TournamentRepository {
         return tournament;
     }
 
+    public void limparCampeao(Long id){
+        jdbi.withHandle(handle -> 
+            handle.createUpdate("UPDATE tournament SET fk_winner_id = NULL WHERE id = :id")
+            .bind("id", id)
+            .execute()
+        );
+    }
+
     public void deletar(Long id){
         jdbi.withHandle(handle -> {
             return handle.createUpdate("DELETE FROM tournament WHERE id = :id")
