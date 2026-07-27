@@ -11,6 +11,7 @@ import com.punish.Repository.TournamentRepository;
 
 public class TournamentService {
     TournamentRepository tournamentRepository = new TournamentRepository();
+    MatchService matchService = new MatchService();
 
     public Tournament criarTournament(String name, String game){
         if(name == null || name.isBlank()) throw new ValidationException("Nome é obrigatório");
@@ -61,6 +62,14 @@ public class TournamentService {
             throw new ConflictException("Torneio não pode ser iniciado");
         }
         tournamentRepository.atualizarStatus(id, "FINISHED");
+    }
+
+    public void recalcularBracket(Long id){
+        Tournament t = buscarPorId(id);
+        if ("FINISHED".equals(t.getStatus())) throw new ConflictException("O torneio ja foi encerrado");
+        matchService.delatarPorTournament(id);
+        tournamentRepository.limparCampeao(id);
+        tournamentRepository.atualizarStatus(id, "CREATED");
     }
 
     public void deletar(Long id){
