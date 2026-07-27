@@ -117,4 +117,8 @@ public class MatchService {
         
         return matchRepository.buscarPorId(id);
     }
+
+    public void delatarPorTournament(Long id){
+        matchRepository.deletarPorTournament(id);
+    }
 }
