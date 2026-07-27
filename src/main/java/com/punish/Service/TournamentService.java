@@ -67,7 +67,7 @@ public class TournamentService {
     public void recalcularBracket(Long id){
         Tournament t = buscarPorId(id);
         if ("FINISHED".equals(t.getStatus())) throw new ConflictException("O torneio ja foi encerrado");
-        matchService.delatarPorTournament(id);
+        matchService.deletarPorTournament(id);
         tournamentRepository.limparCampeao(id);
         tournamentRepository.atualizarStatus(id, "CREATED");
     }
