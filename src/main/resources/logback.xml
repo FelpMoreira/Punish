@@ -1,0 +1,4 @@
+<configuration>
+    <root level="WARN"/>
+    <logger name="org.eclipse.jetty" level="WARN"/>
+</configuration>
