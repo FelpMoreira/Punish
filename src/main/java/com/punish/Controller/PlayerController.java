@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.punish.Model.Player;
+import com.punish.Model.PlayerStats;
 import com.punish.Service.PlayerService;
 
 import io.javalin.Javalin;
@@ -28,6 +29,12 @@ public class PlayerController {
             Long id = Long.parseLong(ctx.pathParam("id"));
             Player p = playerService.buscarPorId(id);
             ctx.json(p);
+        });
+
+        app.get("/players/{id}/stats", ctx -> {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+            PlayerStats stats = playerService.buscarStats(id);
+            ctx.json(stats);
         });
 
         app.post("/tournaments/{id}/players", ctx -> {
