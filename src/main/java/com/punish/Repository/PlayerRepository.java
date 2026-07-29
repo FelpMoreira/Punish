@@ -33,6 +33,15 @@ public class PlayerRepository {
         return player;
     }
 
+    public List<Player> buscarPorNicknameLike(String nickname){
+        return jdbi.withHandle(handle -> {
+            return handle.createQuery("SELECT * FROM player WHERE nickname ILIKE '%' || :nickname || '%'")
+            .bind("nickname", nickname)
+            .mapToBean(Player.class)
+            .list();
+        });
+    }
+
     public List<Player> buscarPorNickname(String nickname){
         return jdbi.withHandle(handle -> {
             return handle.createQuery("SELECT * FROM player WHERE nickname = :nickname")
