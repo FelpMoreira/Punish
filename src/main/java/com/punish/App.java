@@ -37,6 +37,11 @@ public class App
             ctx.status(409).json(Map.of("error ", e.getMessage()));
         });
 
+        javalin.exception(Exception.class, (e, ctx) -> {
+            e.printStackTrace();
+            ctx.status(500).json(Map.of("error", "Erro interno do servidor"));
+        });
+
         new DashboardController().dashboardRoutes(javalin);
         new MatchController().matchRoutes(javalin);
         new PlayerController().playerRoutes(javalin);
