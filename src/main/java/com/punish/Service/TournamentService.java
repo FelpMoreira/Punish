@@ -31,6 +31,13 @@ public class TournamentService {
         return t;
     }
 
+    public List<Tournament> buscarComFiltros(String name, String game, String status){
+        if ((name == null || name.isBlank()) && (game == null || game.isBlank()) && (status == null || status.isBlank())) {
+            return tournamentRepository.buscarTodosOsTorneios();
+        }
+        return tournamentRepository.buscarComFiltros(name, game, status);
+    }
+
     public List<Tournament> buscarPorNome(String name){
         return tournamentRepository.buscarPorNome(name);
     }
