@@ -6,6 +6,7 @@ import com.punish.Exception.ConflictException;
 import com.punish.Exception.NotFoundException;
 import com.punish.Exception.ValidationException;
 import com.punish.Model.Player;
+import com.punish.Model.PlayerStats;
 import com.punish.Model.Tournament;
 import com.punish.Model.Enums.TournamentStatus;
 import com.punish.Repository.PlayerRepository;
@@ -68,6 +69,16 @@ public class PlayerService {
 
     public List<Player> buscarPlayersDoTournament(Long tournament_id){
         return tournamentPlayerRepository.buscarPlayerDoTournament (tournament_id);
+    }
+
+    public PlayerStats buscarStats(Long playerId){
+        buscarPorId(playerId);
+        long vitorias = playerRepository.contarVitorias(playerId);
+        long partidas = playerRepository.contarPartidas(playerId);
+        long torneios = tournamentPlayerRepository.contarPorPlayer(playerId);
+        long derrotas = partidas - vitorias;
+        double winRate = partidas > 0 ? Math.round(vitorias * 10000.0 / partidas) / 100 : 0.0;
+        return new PlayerStats(torneios, vitorias, derrotas, winRate);
     }
 
     public void deletarPlayer(Long id){
