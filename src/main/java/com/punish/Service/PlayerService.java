@@ -28,6 +28,13 @@ public class PlayerService {
         return p;
     }
 
+    public List<Player> buscarNicknameComFiltros(String nickname){
+        if (nickname == null || nickname.isBlank()) {
+            return playerRepository.buscarTodosOsPlayers();
+        }
+        return playerRepository.buscarPorNicknameLike(nickname);
+    }
+
     public List<Player> buscarPorNickname(String nickname){
         return playerRepository.buscarPorNickname(nickname);
     }
