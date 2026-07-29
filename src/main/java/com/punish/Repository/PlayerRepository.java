@@ -68,6 +68,30 @@ public class PlayerRepository {
         );
     }
 
+    public long contarVitorias(Long playerId){
+        return jdbi.withHandle(handle -> 
+            handle.createQuery("SELECT COUNT(*) FROM matches WHERE fk_winner_id = :pid")
+            .bind("pid", playerId)
+            .mapTo(Long.class)
+            .findOne()
+            .orElse(0l)
+        );
+    }
+
+    public long contarPartidas(Long playerId){
+        return jdbi.withHandle(handle -> 
+            handle.createQuery("""
+                    SELECT COUNT(*) FROM matches
+                    WHERE (fk_player1_id = :pid OR fk_player2_id = :pid)
+                    AND fk_winner_id IS NOT NULL
+                    """)
+                .bind("pid", playerId)
+                .mapTo(Long.class)
+                .findOne()
+                .orElse(0L)
+        );
+    }
+
     public void deletar(Long id){
         jdbi.withHandle(handle ->
             handle.createUpdate("DELETE FROM player WHERE id = :id")
