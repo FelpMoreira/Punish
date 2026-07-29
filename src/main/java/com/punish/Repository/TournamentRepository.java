@@ -44,6 +44,22 @@ public class TournamentRepository {
         return tournament;
     }
 
+    public List<Tournament> buscarComFiltros(String name, String game, String status){
+        return jdbi.withHandle(handle -> {
+            return handle.createQuery(("""
+            SELECT * FROM tournament WHERE 1=1
+            AND (:name IS NULL OR name ILIKE '%' || :name || '%')
+            AND (:game IS NULL OR game ILIKE '%' || :game || '%')
+            AND (:status IS NULL OR status = :status::tournament_status)
+            """))
+            .bind("name", name)
+            .bind("game", game)
+            .bind("status", status)
+            .mapToBean(Tournament.class)
+            .list();
+        });
+    }
+
     public List<Tournament> buscarPorNome(String name){
         return jdbi.withHandle(handle -> {
             return handle.createQuery("SELECT * FROM tournament WHERE name = :name")
