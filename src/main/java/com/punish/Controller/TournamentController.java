@@ -23,9 +23,9 @@ public class TournamentController {
 
     public void tournamentRoutes(Javalin app){
         app.get("/tournaments", ctx -> {
-            String name = ctx.pathParam("name");
-            String game = ctx.pathParam("game");
-            String status = ctx.pathParam("status");
+            String name = ctx.queryParam("name");
+            String game = ctx.queryParam("game");
+            String status = ctx.queryParam("status");
             List<Tournament> tournaments = tournamentService.buscarComFiltros(name, game, status);
             ctx.json(tournaments);
         });
@@ -33,7 +33,7 @@ public class TournamentController {
         app.get("/tournaments/{id}", ctx -> {
             Long id = Long.parseLong(ctx.pathParam("id"));
             Tournament t = tournamentService.buscarPorId(id);
-            ctx.status(201).json(t);
+            ctx.status(200).json(t);
         });
 
         app.get("/tournaments/{id}/ranking", ctx -> {
