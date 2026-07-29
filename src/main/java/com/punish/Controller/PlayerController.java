@@ -13,7 +13,8 @@ public class PlayerController {
 
     public void playerRoutes(Javalin app){
         app.get("/players", ctx -> {
-            List<Player> players = playerService.buscarTodosOsPlayers();
+            String nickname = ctx.pathParam("nickname");
+            List<Player> players = playerService.buscarNicknameComFiltros(nickname);
             ctx.json(players);
         });
 
