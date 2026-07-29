@@ -23,7 +23,10 @@ public class TournamentController {
 
     public void tournamentRoutes(Javalin app){
         app.get("/tournaments", ctx -> {
-            List<Tournament> tournaments = tournamentService.buscarTodosOsTorneios();
+            String name = ctx.pathParam("name");
+            String game = ctx.pathParam("game");
+            String status = ctx.pathParam("status");
+            List<Tournament> tournaments = tournamentService.buscarComFiltros(name, game, status);
             ctx.json(tournaments);
         });
 
