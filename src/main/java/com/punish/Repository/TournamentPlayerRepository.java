@@ -82,6 +82,16 @@ public class TournamentPlayerRepository {
         );
     }
 
+    public int contarPorPlayer(Long fk_player_id){
+        return jdbi.withHandle(handle -> 
+            handle.createQuery("SELECT COUNT(*) FROM tournament_player WHERE fk_player_id = :pid")
+            .bind("pid", fk_player_id)
+            .mapTo(Integer.class)
+            .findOne()
+            .orElse(0)
+        );
+    }
+
     public void atualizarSeed(long fk_tournament_id, long fk_player_id, int seed){
         jdbi.withHandle(handle -> 
             handle.createUpdate("UPDATE tournament_player SET seed = :seed WHERE fk_tournament_id = :tid AND fk_player_id = :pid")
