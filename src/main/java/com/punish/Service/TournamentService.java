@@ -5,6 +5,7 @@ import java.util.List;
 import com.punish.Exception.ConflictException;
 import com.punish.Exception.NotFoundException;
 import com.punish.Exception.ValidationException;
+import com.punish.Model.PaginaResult;
 import com.punish.Model.Tournament;
 import com.punish.Model.Enums.TournamentStatus;
 import com.punish.Repository.TournamentRepository;
@@ -36,6 +37,12 @@ public class TournamentService {
             return tournamentRepository.buscarTodosOsTorneios();
         }
         return tournamentRepository.buscarComFiltros(name, game, status);
+    }
+
+    public PaginaResult<Tournament> buscarComPaginacao(String name, String game, String status, int page, int size){
+        List<Tournament> data = tournamentRepository.buscarComPaginacao(name, game, status, page, size);
+        long total = tournamentRepository.contarTotal(name, game, status);
+        return new PaginaResult<>(data, total, page, size);
     }
 
     public List<Tournament> buscarPorNome(String name){
