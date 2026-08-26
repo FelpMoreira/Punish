@@ -7,6 +7,7 @@ import com.punish.Exception.ConflictException;
 import com.punish.Exception.NotFoundException;
 import com.punish.Exception.ValidationException;
 import com.punish.Model.Match;
+import com.punish.Model.PaginaResult;
 import com.punish.Repository.MatchRepository;
 import com.punish.Repository.TournamentRepository;
 
@@ -43,6 +44,12 @@ public class MatchService {
 
     public List<Match> buscarPorTournament(long fk_tournament_id){
         return matchRepository.buscarPorTournament(fk_tournament_id);
+    }
+
+    public PaginaResult<Match> buscarHistorico(Long playerId, Long tournamentId, int page, int size) {
+        List<Match> data = matchRepository.buscarComFiltros(playerId, tournamentId, page, size);
+        long total = matchRepository.contarTotal(playerId, tournamentId);
+        return new PaginaResult<>(data, total, page, size);
     }
 
     public void atualizarNextMatchWin(Long fk_next_match_win_id, Long id){
