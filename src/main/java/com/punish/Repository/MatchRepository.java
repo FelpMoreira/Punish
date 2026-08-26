@@ -44,6 +44,39 @@ public class MatchRepository {
         );
     }
 
+    public List<Match> buscarComFiltros(Long playerId, Long tournamentId, int page, int size) {
+        int offset = (page - 1) * size;
+        return jdbi.withHandle(handle ->
+            handle.createQuery("""
+                SELECT * FROM matches WHERE 1=1
+                AND (:playerId IS NULL OR fk_player1_id = :playerId OR fk_player2_id = :playerId)
+                AND (:tournamentId IS NULL OR fk_tournament_id = :tournamentId)
+                LIMIT :size OFFSET :offset
+            """)
+            .bind("playerId", playerId)
+            .bind("tournamentId", tournamentId)
+            .bind("size", size)
+            .bind("offset", offset)
+            .mapToBean(Match.class)
+            .list()
+        );
+    }
+
+    public long contarTotal(long playerId, long tournamentId){
+        return jdbi.withHandle(handle -> 
+            handle.createQuery("""
+                SELECT COUNT(*) FROM matches WHERE 1=1
+                AND (:playerId IS NULL OR fk_player1_id = :playerId OR fk_player2_id = :playerId)
+                AND (:tournamentId IS NULL OR fk_tournament_id = :tournamentId)
+            """)
+            .bind("playerId", playerId)
+            .bind("tournamentId", tournamentId)
+            .mapTo(Long.class)
+            .findOne()
+            .orElse(0L)
+        );
+    }
+
     public void deletarPorTournament(Long fk_tournament_id){
         jdbi.withHandle(handle ->
             handle.createUpdate("DELETE FROM matches WHERE fk_tournament_id = :tid")
