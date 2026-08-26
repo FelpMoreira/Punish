@@ -5,6 +5,7 @@ import java.util.List;
 import com.punish.Exception.ConflictException;
 import com.punish.Exception.NotFoundException;
 import com.punish.Exception.ValidationException;
+import com.punish.Model.PaginaResult;
 import com.punish.Model.Player;
 import com.punish.Model.PlayerStats;
 import com.punish.Model.Tournament;
@@ -38,6 +39,12 @@ public class PlayerService {
 
     public List<Player> buscarPorNickname(String nickname){
         return playerRepository.buscarPorNickname(nickname);
+    }
+
+    public PaginaResult<Player> buscarComPaginacao(String nickname, int page, int size){
+        List<Player> data = playerRepository.buscarComPaginacao(nickname, page, size);
+        long total = playerRepository.contarTotal(nickname);
+        return new PaginaResult<>(data, total, page, size);
     }
 
     public List<Player> buscarTodosOsPlayers(){
