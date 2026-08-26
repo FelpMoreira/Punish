@@ -26,8 +26,17 @@ public class TournamentController {
             String name = ctx.queryParam("name");
             String game = ctx.queryParam("game");
             String status = ctx.queryParam("status");
-            List<Tournament> tournaments = tournamentService.buscarComFiltros(name, game, status);
-            ctx.json(tournaments);
+            String pageStr = ctx.queryParam("page");
+            String sizeStr = ctx.queryParam("size");
+            if (pageStr != null && sizeStr != null) {
+                int page = Integer.parseInt(pageStr);
+                int size = Integer.parseInt(sizeStr);
+                var result = tournamentService.buscarComPaginacao(name, game, status, page, size);
+                ctx.json(result);
+            } else {
+                List<Tournament> tournaments = tournamentService.buscarComFiltros(name, game, status);
+                ctx.json(tournaments);
+            }
         });
 
         app.get("/tournaments/{id}", ctx -> {

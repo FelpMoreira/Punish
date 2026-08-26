@@ -15,8 +15,17 @@ public class PlayerController {
     public void playerRoutes(Javalin app){
         app.get("/players", ctx -> {
             String nickname = ctx.queryParam("nickname");
-            List<Player> players = playerService.buscarNicknameComFiltros(nickname);
-            ctx.json(players);
+            String pageStr = ctx.queryParam("page");
+            String sizeStr = ctx.queryParam("size");
+            if (pageStr != null && sizeStr != null) {
+                int page = Integer.parseInt(pageStr);
+                int size = Integer.parseInt(sizeStr);
+                var result = playerService.buscarComPaginacao(nickname, page, size);
+                ctx.json(result);
+            } else {
+                List<Player> players = playerService.buscarNicknameComFiltros(nickname);
+                ctx.json(players);
+            }
         });
 
         app.post("/players", ctx -> {
