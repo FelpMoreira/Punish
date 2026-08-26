@@ -33,6 +33,35 @@ public class PlayerRepository {
         return player;
     }
 
+    public List<Player> buscarComPaginacao(String nickname, int page, int size){
+        int offset = (page - 1) * size;
+        return jdbi.withHandle(handle -> {
+            return handle.createQuery("""
+                SELECT * FROM player
+                WHERE (:nickname IS NULL OR :nickname ILIKE '%' || :nickname || '%')
+                LIMIT :size OFFSET :offset
+            """)
+            .bind("nickname", nickname)
+            .bind("size", size)
+            .bind("offset", offset)
+            .mapToBean(Player.class)
+            .list();
+        });
+    }
+
+    public long contarTotal(String nickname){
+        return jdbi.withHandle(handle -> 
+            handle.createQuery("""
+                SELECT COUNT(*) FROM player
+                WHERE (:nickname IS NULL OR :nickname ILIKE '%' || :nickname || '%')
+            """)
+            .bind("nickname", nickname)
+            .mapTo(Long.class)
+            .findOne()
+            .orElse(0L)
+        );
+    }
+
     public List<Player> buscarPorNicknameLike(String nickname){
         return jdbi.withHandle(handle -> {
             return handle.createQuery("SELECT * FROM player WHERE nickname ILIKE '%' || :nickname || '%'")
