@@ -60,6 +60,43 @@ public class TournamentRepository {
         });
     }
 
+    public List<Tournament> buscarComPaginacao(String name, String game, String status, int page, int size){
+        int offset = (page - 1) * size;
+        return jdbi.withHandle(handle -> {
+            return handle.createQuery("""
+                SELECT * FROM tournament WHERE 1=1
+                AND (:name IS NULL OR :name ILIKE '%' || :name || '%')
+                AND (:game IS NULL OR :game ILIKE '%' || :game || '%')
+                AND (:status IS NULL OR status = :status)
+                LIMIT :size OFFSET :offset
+            """)
+            .bind("name", name)
+            .bind("game", game)
+            .bind("status", status)
+            .bind("size", size)
+            .bind("offset", offset)
+            .mapToBean(Tournament.class)
+            .list();
+        });
+    }
+
+    public long contarTotal(String name, String game, String status){
+        return jdbi.withHandle(handle ->
+            handle.createQuery("""
+                    SELECT COUNT (*) FROM tournament WHERE 1=1
+                    AND (:name IS NULL OR :name ILIKE '%' || :name || '%')
+                    AND (:game IS NULL OR :game ILIKE '%' || :game || '%')
+                    AND (:status IS NULL OR status = :status)
+                    """)
+                .bind("name", name)
+                .bind("game", game)
+                .bind("status", status)
+                .mapTo(Long.class)
+                .findOne()
+                .orElse(0L)
+        );
+    }
+
     public List<Tournament> buscarPorNome(String name){
         return jdbi.withHandle(handle -> {
             return handle.createQuery("SELECT * FROM tournament WHERE name = :name")
