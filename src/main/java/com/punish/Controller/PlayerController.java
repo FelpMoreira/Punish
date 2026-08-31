@@ -28,12 +28,6 @@ public class PlayerController {
             }
         });
 
-        app.post("/players", ctx -> {
-            Map<String, String> body = ctx.bodyAsClass(Map.class);
-            Player p = playerService.criarPlayer(body.get("nickname"));
-            ctx.status(201).json(p);
-        });
-
         app.get("/players/{id}", ctx -> {
             Long id = Long.parseLong(ctx.pathParam("id"));
             Player p = playerService.buscarPorId(id);
