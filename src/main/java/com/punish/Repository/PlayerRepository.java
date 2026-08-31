@@ -37,7 +37,7 @@ public class PlayerRepository {
 
     public Player buscarPorEmail(String email) {
         return jdbi.withHandle(handle -> {
-            Optional<Player> result = handle.createQuery("SELECT * FROM player WHERE id = :id")
+            Optional<Player> result = handle.createQuery("SELECT * FROM player WHERE email = :email")
             .bind("email", email)
             .mapToBean(Player.class)
             .findOne();
