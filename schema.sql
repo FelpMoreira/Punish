@@ -64,3 +64,7 @@ CREATE INDEX idx_m_next_lose  ON matches(fk_next_match_lose_id);
 INSERT INTO tournament (name, game) VALUES ('Tekken IFCE 2026', 'Tekken 7');
 INSERT INTO player (nickname) VALUES ('Felp'), ('Leandro'), ('Isaias'), ('Pedro'),
                                      ('Joao'), ('Maria'), ('Jose'), ('Ana');
+
+ALTER TABLE player ADD COLUMN IF NOT EXISTS email VARCHAR(100) UNIQUE;
+ALTER TABLE player ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255) NOT NULL DEFAULT '';
+ALTER TABLE player ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'PLAYER';
