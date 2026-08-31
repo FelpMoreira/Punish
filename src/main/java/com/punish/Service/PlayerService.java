@@ -24,7 +24,7 @@ public class PlayerService {
         if(nickname == null || nickname.isBlank()) throw new ValidationException("Nickname é obrigatório");
         if(nickname.length() > 50) throw new ValidationException("Nickname muito longo");
         if(email == null || email.isBlank()) throw new ValidationException("Email é obrigatório");
-        if(password == null || password.isBlank()) throw new ValidationException("Senha deve ter no minimo 6 caracteres");
+        if(password == null || password.length() < 6) throw new ValidationException("Senha deve ter no minimo 6 caracteres");
         String passwordhash = BCrypt.hashpw(password, BCrypt.gensalt());
         return playerRepository.criarPlayer(nickname, email, passwordhash);
     }
