@@ -10,10 +10,12 @@ import com.punish.Model.Player;
 
 public class PlayerRepository {
     Jdbi jdbi = Database.getJdbi();
-    public Player criarPlayer(String nickname){
+    public Player criarPlayer(String nickname, String email, String password_hash){
         Long id = jdbi.withHandle(handle -> {
-            return handle.createUpdate("INSERT INTO player (nickname) VALUES (:nickname)")
+            return handle.createUpdate("INSERT INTO player (nickname, email, password_hash) VALUES (:nickname, :email, :password_hash)")
             .bind("nickname", nickname)
+            .bind("email", email)
+            .bind("password_hash", password_hash)
             .executeAndReturnGeneratedKeys("id")
             .mapTo(Long.class)
             .findOne()
@@ -31,6 +33,16 @@ public class PlayerRepository {
             return result.orElse(null);
         });
         return player;
+    }
+
+    public Player buscarPorEmail(String email) {
+        return jdbi.withHandle(handle -> {
+            Optional<Player> result = handle.createQuery("SELECT * FROM player WHERE id = :id")
+            .bind("email", email)
+            .mapToBean(Player.class)
+            .findOne();
+            return result.orElse(null); 
+        });
     }
 
     public List<Player> buscarComPaginacao(String nickname, int page, int size){
