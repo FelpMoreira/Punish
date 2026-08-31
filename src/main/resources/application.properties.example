@@ -1,3 +1,4 @@
 db.url=jdbc:postgresql://localhost:5432/seu_banco
 db.user=seu_usuario
 db.password=sua_senha
+jwt.secret=SECRET-AQUI
