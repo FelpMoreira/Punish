@@ -2,6 +2,8 @@ package com.punish.Service;
 
 import java.util.List;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import com.punish.Exception.ConflictException;
 import com.punish.Exception.NotFoundException;
 import com.punish.Exception.ValidationException;
@@ -18,10 +20,13 @@ public class PlayerService {
     private TournamentPlayerRepository tournamentPlayerRepository = new TournamentPlayerRepository();
     PlayerRepository playerRepository = new PlayerRepository();
 
-    public Player criarPlayer(String nickname){
+    public Player criarPlayer(String nickname, String email, String password){
         if(nickname == null || nickname.isBlank()) throw new ValidationException("Nickname é obrigatório");
         if(nickname.length() > 50) throw new ValidationException("Nickname muito longo");
-        return playerRepository.criarPlayer(nickname);
+        if(email == null || email.isBlank()) throw new ValidationException("Email é obrigatório");
+        if(password == null || password.isBlank()) throw new ValidationException("Senha deve ter no minimo 6 caracteres");
+        String passwordhash = BCrypt.hashpw(password, BCrypt.gensalt());
+        return playerRepository.criarPlayer(nickname, email, passwordhash);
     }
 
     public Player buscarPorId(Long id){
