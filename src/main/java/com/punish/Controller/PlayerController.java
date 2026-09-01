@@ -6,11 +6,13 @@ import java.util.Map;
 import com.punish.Model.Player;
 import com.punish.Model.PlayerStats;
 import com.punish.Service.PlayerService;
+import com.punish.Service.TournamentService;
 
 import io.javalin.Javalin;
 
 public class PlayerController {
     PlayerService playerService = new PlayerService();
+    TournamentService tournamentService = new TournamentService();
 
     public void playerRoutes(Javalin app){
         app.get("/players", ctx -> {
@@ -42,6 +44,13 @@ public class PlayerController {
 
         app.post("/tournaments/{id}/players", ctx -> {
             Long tournament_id = Long.parseLong(ctx.pathParam("id"));
+            Long userId = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            tournamentService.verificarDono(
+                tournament_id,
+                userId,
+                userRole
+            );
             Map<String, Object> body = ctx.bodyAsClass(Map.class);
             Long playerId = ((Number) body.get("playerId")).longValue();
             playerService.adicionarAoTournament(tournament_id, playerId);
@@ -56,6 +65,13 @@ public class PlayerController {
 
         app.delete("/tournaments/{id}/players/{player_id}", ctx -> {
             Long tournament_id = Long.parseLong(ctx.pathParam("id"));
+            Long userId = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            tournamentService.verificarDono(
+                tournament_id,
+                userId,
+                userRole
+            );
             Long player_id = Long.parseLong(ctx.pathParam("player_id"));
             playerService.removerPlayersDoTournament(tournament_id, player_id);
             ctx.status(204);
