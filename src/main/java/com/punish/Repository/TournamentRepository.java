@@ -10,13 +10,14 @@ import com.punish.Model.Tournament;
 
 public class TournamentRepository {
     Jdbi jdbi = Database.getJdbi();
-    public Tournament criarTournament(String name, String game){ 
+    public Tournament criarTournament(String name, String game, Long fk_owner){ 
         Long id = jdbi.withHandle(handle -> {
             return handle.createUpdate("""
-                INSERT INTO tournament (name, game) VALUES (:name, :game)
+                INSERT INTO tournament (name, game, fk_owner) VALUES (:name, :game, :fk_owner)
             """)
             .bind("name", name)
             .bind("game", game)
+            .bind("fk_owner", fk_owner)
             .executeAndReturnGeneratedKeys("id")
             .mapTo(Long.class)
             .findOne()
