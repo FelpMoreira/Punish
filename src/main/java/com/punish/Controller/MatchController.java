@@ -5,11 +5,13 @@ import java.util.List;
 import com.punish.Model.Match;
 import com.punish.Model.ResultadoRequest;
 import com.punish.Service.MatchService;
+import com.punish.Service.TournamentService;
 
 import io.javalin.Javalin;
 
 public class MatchController {
     MatchService matchService = new MatchService();
+    TournamentService tournamentService = new TournamentService();
 
     public void matchRoutes(Javalin app){
         app.get("/tournaments/{id}/matches", ctx -> {
@@ -45,19 +47,46 @@ public class MatchController {
 
         app.patch("/matches/{id}/result", ctx -> {
             Long match_id = Long.parseLong(ctx.pathParam("id"));
+            Long userId = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            Match match = matchService.buscarPorId(match_id);
+            tournamentService.verificarDono(
+                match.getFk_tournament_id(),
+                userId,
+                userRole
+            );
             ResultadoRequest body = ctx.bodyAsClass(ResultadoRequest.class);
-            Match matchAtualizada = matchService.registrarResultado(match_id, body.fk_winner_id(), body.score_player1(), body.score_player2());
+            Match matchAtualizada = matchService.registrarResultado(
+                match_id, body.fk_winner_id(),
+                body.score_player1(),
+                body.score_player2()
+            );
             ctx.json(matchAtualizada);
         });
 
         app.patch("/matches/{id}/start", ctx -> {
             Long match_id = Long.parseLong(ctx.pathParam("id"));
+            Long userId = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            Match match = matchService.buscarPorId(match_id);
+            tournamentService.verificarDono(
+                match.getFk_tournament_id(),
+                userId,
+                userRole
+            );
             Match m = matchService.iniciarPartida(match_id);
             ctx.json(m);
         });
 
         app.patch("/tournaments/{id}/matches/start-round", ctx -> {
             Long tournamentId = Long.parseLong(ctx.pathParam("id"));
+            Long userId = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            tournamentService.verificarDono(
+                tournamentId,
+                userId,
+                userRole
+            );
             var body = ctx.bodyAsClass(java.util.Map.class);
             int round = ((Number) body.get("round")).intValue();
             var started = matchService.iniciarRodada(tournamentId, round);
