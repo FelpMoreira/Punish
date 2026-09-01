@@ -31,7 +31,13 @@ public class TournamentController {
             if (pageStr != null && sizeStr != null) {
                 int page = Integer.parseInt(pageStr);
                 int size = Integer.parseInt(sizeStr);
-                var result = tournamentService.buscarComPaginacao(name, game, status, page, size);
+                var result = tournamentService.buscarComPaginacao(
+                    name,
+                    game,
+                    status,
+                    page,
+                    size
+                );
                 ctx.json(result);
             } else {
                 List<Tournament> tournaments = tournamentService.buscarComFiltros(name, game, status);
@@ -52,16 +58,25 @@ public class TournamentController {
         });
 
         app.post("/tournaments", ctx -> {
+            Long userId = ctx.attribute("userId");
             Tournament body = ctx.bodyAsClass(Tournament.class);
             Tournament t = tournamentService.criarTournament(
                 body.getName(),
-                body.getGame()
+                body.getGame(),
+                userId
             );
             ctx.status(201).json(t);
         });
 
         app.put("/tournaments/{id}", ctx -> {
             Long id = Long.parseLong(ctx.pathParam("id"));
+            Long userId = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            tournamentService.verificarDono(
+                id,
+                userId,
+                userRole
+            );
             Tournament body = ctx.bodyAsClass(Tournament.class);
             Tournament t = tournamentService.atualizarTournament(
                 id,
@@ -73,18 +88,39 @@ public class TournamentController {
 
         app.post("/tournaments/{id}/start", ctx -> {
             Long id = Long.parseLong(ctx.pathParam("id"));
+            Long userId = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            tournamentService.verificarDono(
+                id,
+                userId,
+                userRole
+            );
             tournamentService.start(id);
             ctx.status(204);
         });
 
         app.post("/tournaments/{id}/finish", ctx -> {
             Long id = Long.parseLong(ctx.pathParam("id"));
+            Long userid = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            tournamentService.verificarDono(
+                id, 
+                userid,
+                userRole
+            );
             tournamentService.finish(id);
             ctx.status(204);
         });
 
         app.post("/tournaments/{id}/generate", ctx -> {
             Long id = Long.parseLong(ctx.pathParam("id"));
+            Long userId = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            tournamentService.verificarDono(
+                id,
+                userId,
+                userRole
+            );
             tournamentService.start(id);
             List<Player> players = playerService.buscarPlayersDoTournament(id);
             List<Match> matches = bracketService.gerarBracket(id, players);
@@ -93,12 +129,26 @@ public class TournamentController {
 
         app.post("/tournaments/{id}/recalculate", ctx -> {
             Long id = Long.parseLong(ctx.pathParam("id"));
+            Long userId = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            tournamentService.verificarDono(
+                id,
+                userId,
+                userRole
+            );
             tournamentService.recalcularBracket(id);
             ctx.status(204);
         });
 
         app.delete("/tournaments/{id}", ctx -> {
             Long id = Long.parseLong(ctx.pathParam("id"));
+            Long userId = ctx.attribute("userId");
+            String userRole = ctx.attribute("userRole");
+            tournamentService.verificarDono(
+                id,
+                userId,
+                userRole
+            );
             tournamentService.deletar(id);
             ctx.status(204);
         });
