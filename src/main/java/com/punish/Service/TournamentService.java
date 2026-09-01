@@ -14,12 +14,21 @@ public class TournamentService {
     TournamentRepository tournamentRepository = new TournamentRepository();
     MatchService matchService = new MatchService();
 
-    public Tournament criarTournament(String name, String game){
+    public Tournament criarTournament(String name, String game, Long fk_owner){
         if(name == null || name.isBlank()) throw new ValidationException("Nome é obrigatório");
         if(name.length() > 100) throw new ValidationException("Nome muito longo");
         if(game == null || game.isBlank()) throw new ValidationException("Jogo é obrigatório");
         if(game.length() > 50) throw new ValidationException("Nome do jogo muito longo");
-        return tournamentRepository.criarTournament(name, game);
+        if(fk_owner == null) throw new ValidationException("Dono do torneio é obrigatório");
+        return tournamentRepository.criarTournament(name, game, fk_owner);
+    }
+
+    public void verificarDono(Long tournamentId, Long userId, String userRole){
+        if ("ADMIN".equals(userRole)) return;
+        Tournament t = buscarPorId(tournamentId);
+        if (t.getFk_owner() == null || !t.getFk_owner().equals(userId)){
+            throw new ConflictException("Você não tem permissão para gerenciar este torneio");
+        }
     }
 
     public List<Tournament> buscarTodosOsTorneios(){
