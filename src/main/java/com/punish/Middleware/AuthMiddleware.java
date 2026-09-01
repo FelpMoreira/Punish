@@ -1,10 +1,10 @@
 package com.punish.Middleware;
 
-import java.util.Map;
-
 import com.punish.Config.JwtConfig;
 
 import io.javalin.Javalin;
+import io.javalin.http.ForbiddenResponse;
+import io.javalin.http.UnauthorizedResponse;
 import io.jsonwebtoken.Claims;
 
 public class AuthMiddleware {
@@ -19,22 +19,20 @@ public class AuthMiddleware {
             // extrair token
             String auth = ctx.header("Authorization");
             if (auth == null || !auth.startsWith("Bearer ")) {
-                ctx.status(401).json(Map.of("error", "Token não fornecido"));
-                return;
+                throw new UnauthorizedResponse("Token não fornecido");
             }
             try {
                 Claims claims = JwtConfig.parseToken(auth.substring(7));
                 ctx.attribute("userId", Long.parseLong(claims.getSubject()));
                 ctx.attribute("userRole", claims.get("role", String.class));
             } catch (Exception e) {
-                ctx.status(401).json(Map.of("error", "Token inválido"));
-                return;
+                throw new UnauthorizedResponse("Token inválido");
             }
 
             // verificar role
             String role = ctx.attribute("userRole");
             if (needsOrganizer(path, method) && !"ORGANIZER".equals(role) && !"ADMIN".equals(role)) {
-                ctx.status(403).json(Map.of("error", "Sem permissão"));
+                throw new ForbiddenResponse("Sem permissão");
             } 
         });
 
@@ -47,7 +45,8 @@ public class AuthMiddleware {
     }
 
     private static boolean needsOrganizer(String path, String method){
-        // POST/PUT/DELET de torneios e gerenciamentos de player
-        return true; // simplificado (vai ser refinado na implementação)
+        // deleção global de player: exige ORGANIZER/ADMIN
+        if ("DELETE".equals(method) && path.matches("/players/\\d+")) return true;
+        return false;
     }
 }
