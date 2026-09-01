@@ -10,6 +10,7 @@ import com.punish.Controller.TournamentController;
 import com.punish.Exception.ConflictException;
 import com.punish.Exception.NotFoundException;
 import com.punish.Exception.ValidationException;
+import com.punish.Middleware.AuthMiddleware;
 
 import io.javalin.Javalin;
 
@@ -43,6 +44,7 @@ public class App
             ctx.status(500).json(Map.of("error", "Erro interno do servidor"));
         });
 
+        AuthMiddleware.register(javalin);
         new DashboardController().dashboardRoutes(javalin);
         new MatchController().matchRoutes(javalin);
         new PlayerController().playerRoutes(javalin);
