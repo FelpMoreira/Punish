@@ -46,6 +46,28 @@ CREATE TABLE matches (
     status                VARCHAR(20) NOT NULL DEFAULT 'WAITING'
 );
 
+-- Convite (link do organizador)
+CREATE TABLE tournament_invite (
+    id               BIGSERIAL    PRIMARY KEY,
+    fk_tournament_id BIGINT       NOT NULL REFERENCES tournament(id) ON DELETE CASCADE,
+    codigo           VARCHAR(36)  NOT NULL UNIQUE,
+    criado_em        TIMESTAMP    NOT NULL DEFAULT NOW(),
+    expira_em        TIMESTAMP,
+    usos_max         INT,
+    usos             INT          NOT NULL DEFAULT 0
+);
+
+
+-- Pedido de entrada
+CREATE TABLE tournament_request (
+    id               BIGSERIAL    PRIMARY KEY,
+    fk_tournament_id BIGINT       NOT NULL REFERENCES tournament(id) ON DELETE CASCADE,
+    fk_player_id     BIGINT       NOT NULL REFERENCES player(id) ON DELETE CASCADE,
+    status           VARCHAR(20)  NOT NULL DEFAULT 'PENDING',
+    criado_em        TIMESTAMP    NOT NULL DEFAULT NOW(),
+    UNIQUE(fk_tournament_id, fk_player_id)
+);
+
 -- ============================================================
 -- Índices
 -- ============================================================
@@ -57,6 +79,10 @@ CREATE INDEX idx_m_player2    ON matches(fk_player2_id);
 CREATE INDEX idx_m_winner     ON matches(fk_winner_id);
 CREATE INDEX idx_m_next_win   ON matches(fk_next_match_win_id);
 CREATE INDEX idx_m_next_lose  ON matches(fk_next_match_lose_id);
+CREATE INDEX idx_inv_tournament ON tournament_invite(fk_tournament_id);
+CREATE INDEX idx_req_tournament ON tournament_request(fk_tournament_id);
+CREATE INDEX idx_req_player     ON tournament_request(fk_player_id);
+
 
 -- ============================================================
 -- Inserts opcionais (dados de exemplo)
