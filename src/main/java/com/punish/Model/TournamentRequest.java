@@ -1,6 +1,6 @@
 package com.punish.Model;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class TournamentRequest {
     private Long id;
@@ -12,7 +12,7 @@ public class TournamentRequest {
     public TournamentRequest() {}
 
     public Long getId() { return id; }
-    public void setid(Long id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public Long getFk_tournament_id() { return fk_tournament_id; }
     public void setFk_tournament_id(Long fk_tournament_id) { this.fk_tournament_id = fk_tournament_id; }
