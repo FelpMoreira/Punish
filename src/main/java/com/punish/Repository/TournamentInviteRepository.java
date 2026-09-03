@@ -23,7 +23,17 @@ public class TournamentInviteRepository {
             .findOne()
             .orElse(null); 
         });
-        return buscarPorCodigo(codigo);
+        return buscarPorId(id);
+    }
+
+    public TournamentInvite buscarPorId(Long id){
+        return jdbi.withHandle(handle ->
+            handle.createQuery("SELECT * FROM tournament_invite WHERE id = :id")
+            .bind("id", id)
+            .mapToBean(TournamentInvite.class)
+            .findOne()
+            .orElse(null)
+        );
     }
 
     public TournamentInvite buscarPorCodigo(String codigo) {
