@@ -1,6 +1,6 @@
 package com.punish.Model;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class TournamentInvite {
     private Long id;
