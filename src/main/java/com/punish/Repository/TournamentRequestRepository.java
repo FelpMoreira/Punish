@@ -48,7 +48,7 @@ public class TournamentRequestRepository {
 
     public void atualizarStatus(Long id, String status){
         jdbi.withHandle(handle ->
-            handle.createUpdate("UPDATE tournament_request")
+            handle.createUpdate("UPDATE tournament_request SET status = :status WHERE id = :id")
             .bind("id", id)
             .bind("status", status)
             .execute()
