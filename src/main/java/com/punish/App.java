@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.punish.Controller.AuthController;
 import com.punish.Controller.DashboardController;
+import com.punish.Controller.InviteController;
 import com.punish.Controller.MatchController;
 import com.punish.Controller.PlayerController;
 import com.punish.Controller.TournamentController;
@@ -50,6 +51,6 @@ public class App
         new PlayerController().playerRoutes(javalin);
         new TournamentController().tournamentRoutes(javalin);
         new AuthController().authRoutes(javalin);
-
+        new InviteController().inviteRoutes(javalin);
     }
 }
