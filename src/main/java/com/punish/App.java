@@ -29,15 +29,15 @@ public class App
         }).start(7000);
 
         javalin.exception(NotFoundException.class, (e, ctx) -> {
-            ctx.status(404).json(Map.of("error ", e.getMessage()));
+            ctx.status(404).json(Map.of("error", e.getMessage()));
         });
 
         javalin.exception(ValidationException.class, (e, ctx) -> {
-            ctx.status(400).json(Map.of("error ", e.getMessage()));
+            ctx.status(400).json(Map.of("error", e.getMessage()));
         });
 
         javalin.exception(ConflictException.class, (e, ctx) -> {
-            ctx.status(409).json(Map.of("error ", e.getMessage()));
+            ctx.status(409).json(Map.of("error", e.getMessage()));
         });
 
         javalin.exception(Exception.class, (e, ctx) -> {
