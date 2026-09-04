@@ -2,9 +2,11 @@ package com.punish.Controller;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.punish.Model.Tournament;
 import com.punish.Model.TournamentInvite;
 import com.punish.Model.TournamentRequest;
 import com.punish.Service.InviteService;
@@ -105,6 +107,22 @@ public class InviteController {
 
             inviteService.rejeitarPedido(id, playerId);
             ctx.status(204);
+        });
+
+        app.get("/invites/{codigo}", ctx -> {
+            String codigo = ctx.pathParam("codigo");
+            TournamentInvite invite = inviteService.buscarPorCodigo(codigo);
+            Tournament t = tournamentService.buscarPorId(invite.getFk_tournament_id());
+
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("codigo", invite.getCodigo());
+            resp.put("usosMax", invite.getUsos_max());
+            resp.put("usos", invite.getUsos());
+            resp.put("expiraEm", invite.getExpira_em());
+            resp.put("tournamentId", t.getId());
+            resp.put("tournamentName", t.getName());
+            resp.put("tournamentStatus", t.getStatus().toString());
+            ctx.json(resp);
         });
     }
 }
