@@ -68,6 +68,15 @@ CREATE TABLE tournament_request (
     UNIQUE(fk_tournament_id, fk_player_id)
 );
 
+CREATE TABLE refresh_token (
+    id               BIGSERIAL    PRIMARY KEY,
+    fk_player_id     BIGINT       NOT NULL REFERENCES player(id) ON DELETE CASCADE,
+    token            VARCHAR(255) NOT NULL UNIQUE,
+    criado_em        TIMESTAMP    NOT NULL DEFAULT NOW(),
+    expira_em        TIMESTAMP    TIMESTAMP NOT NULL,
+    revogado         BOOLEAN      NOT NULL DEFAULT FALSE
+)
+
 -- ============================================================
 -- Índices
 -- ============================================================
