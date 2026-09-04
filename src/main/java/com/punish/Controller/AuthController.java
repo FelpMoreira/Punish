@@ -19,8 +19,20 @@ public class AuthController {
 
         app.post("/auth/login", ctx -> {
             Map<String, String> body = ctx.bodyAsClass(Map.class);
-            String token = authService.login(body.get("email"), body.get("password"));
-            ctx.json(Map.of("token", token, "email", body.get("email")));
+            Map<String, String> result = authService.login(body.get("email"), body.get("password"));
+            ctx.json(result);
+        });
+
+        app.post("/auth/refresh", ctx -> {
+            Map<String, String> body = ctx.bodyAsClass(Map.class);
+            Map<String, String> result = authService.refresh(body.get("refreshToken"));
+            ctx.json(result);
+        });
+
+        app.post("/auth/logout", ctx -> {
+            Map<String, String> body = ctx.bodyAsClass(Map.class);
+            authService.logout(body.get("refreshToken"));
+            ctx.status(204);
         });
     }
 }
