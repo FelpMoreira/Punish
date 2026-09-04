@@ -77,6 +77,13 @@ CREATE TABLE refresh_token (
     revogado         BOOLEAN      NOT NULL DEFAULT FALSE
 );
 
+CREATE TABLE tournament_invite_usage (
+    id               BIGSERIAL    PRIMARY KEY,
+    fk_invite_id     BIGINT       NOT NULL REFERENCES tournament_invite(id) ON DELETE CASCADE,
+    fk_player_id     BIGINT       NOT NULL REFERENCES player(id) ON DELETE CASCADE,
+    usado_em         TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
 -- ============================================================
 -- Índices
 -- ============================================================
