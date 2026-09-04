@@ -39,7 +39,10 @@ public class AuthMiddleware {
     }
 
     private static boolean isPublic(String path, String method){
-        if ("POST".equals(method) && (path.equals("/auth/register") || path.equals("/auth/login"))) return true;
+        if ("POST".equals(method) && (path.equals("/auth/register")
+            || path.equals("/auth/login")
+            || path.equals("/auth/refresh")
+            || path.equals("/auth/logout"))) return true;
         if ("GET".equals(method)) return true;
         return false;
     }
