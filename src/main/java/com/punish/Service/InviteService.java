@@ -41,7 +41,7 @@ public class InviteService {
         return inviteRepository.buscarPorTournament(tournamentId);
     }
 
-    public void deletar(Long inviteId){
+    public void revogarConvite(Long inviteId){
         inviteRepository.deletar(inviteId);
     }
 
