@@ -73,9 +73,9 @@ CREATE TABLE refresh_token (
     fk_player_id     BIGINT       NOT NULL REFERENCES player(id) ON DELETE CASCADE,
     token            VARCHAR(255) NOT NULL UNIQUE,
     criado_em        TIMESTAMP    NOT NULL DEFAULT NOW(),
-    expira_em        TIMESTAMP    TIMESTAMP NOT NULL,
+    expira_em        TIMESTAMP    NOT NULL,
     revogado         BOOLEAN      NOT NULL DEFAULT FALSE
-)
+);
 
 -- ============================================================
 -- Índices
