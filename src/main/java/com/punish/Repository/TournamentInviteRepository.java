@@ -57,7 +57,7 @@ public class TournamentInviteRepository {
 
     public void incrementarUsos(Long id){
         jdbi.withHandle(handle -> 
-            handle.createUpdate("UPDATE tournament_invite SET uso = uso + 1 WHERE id = :id")
+            handle.createUpdate("UPDATE tournament_invite SET usos = usos + 1 WHERE id = :id")
             .bind("id", id)
             .execute()
         );
