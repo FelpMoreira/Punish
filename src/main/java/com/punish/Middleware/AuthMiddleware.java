@@ -13,6 +13,22 @@ public class AuthMiddleware {
             String path = ctx.path();
             String method = ctx.method().name();
 
+            // rotas admin: so admin (checar antes de isPublic, senao GET ficaria livre)
+            if (path.startsWith("/admin/")) {
+                String role = null;
+                String auth = ctx.header("Authorization");
+                if (auth != null && auth.startsWith("Bearer ")) {
+                    try {
+                        Claims claims = JwtConfig.parseToken(auth.substring(7));
+                        ctx.attribute("userId", Long.parseLong(claims.getSubject()));
+                        ctx.attribute("userRole", claims.get("role", String.class));
+                        role = claims.get("role", String.class);
+                    } catch (Exception ignored) {}
+                }
+                if (!"ADMIN".equals(role)) throw new ForbiddenResponse("Somente admin");
+                return;
+            }
+
             // rotas publicas
             if (isPublic(path, method)) return;
 
@@ -33,7 +49,7 @@ public class AuthMiddleware {
             String role = ctx.attribute("userRole");
             if (needsOrganizer(path, method) && !"ORGANIZER".equals(role) && !"ADMIN".equals(role)) {
                 throw new ForbiddenResponse("Sem permissão");
-            } 
+            }
         });
 
     }

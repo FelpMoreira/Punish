@@ -2,6 +2,7 @@ package com.punish;
 
 import java.util.Map;
 
+import com.punish.Controller.AdminController;
 import com.punish.Controller.AuthController;
 import com.punish.Controller.DashboardController;
 import com.punish.Controller.InviteController;
@@ -46,6 +47,7 @@ public class App
         });
 
         AuthMiddleware.register(javalin);
+        new AdminController().adminRoutes(javalin);
         new DashboardController().dashboardRoutes(javalin);
         new MatchController().matchRoutes(javalin);
         new PlayerController().playerRoutes(javalin);

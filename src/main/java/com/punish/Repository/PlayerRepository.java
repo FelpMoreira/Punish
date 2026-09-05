@@ -24,6 +24,23 @@ public class PlayerRepository {
         return buscarPorId(id);
     }
 
+    public List<Player> listarTodos(){
+        return jdbi.withHandle(handle ->
+            handle.createQuery("SELECT * FROM player ORDER BY nickname")
+            .mapToBean(Player.class)
+            .list()
+        ) ;
+    }
+
+    public void atualiazrRole(Long id, String role){
+        jdbi.withHandle(handle ->
+            handle.createUpdate("UPDATE player SET role = :role WHERE id = :id")
+            .bind("role", role)
+            .bind("id", id)
+            .execute()
+        );
+    }
+
     public Player buscarPorId(Long id){
         Player player = jdbi.withHandle(handle -> {
             Optional<Player> result = handle.createQuery("SELECT * FROM player WHERE id = :id")
