@@ -26,16 +26,17 @@ public class Database {
         return jdbi;
     }
 
-    public static Properties loadProperties() throws IOException{
+    public static Properties loadProperties(){
         Properties props = new Properties();
         try (InputStream input = Database.class.getResourceAsStream("/application.properties")) {
-            if (input == null) {
-                throw new IOException("Sorry, unable to find " + "/application.properties");
+            if (input != null) {
+                props.load(input);
             }
-            props.load(input);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         if (System.getenv("DB_URL") != null) props.setProperty("db.url", System.getenv("DB_URL"));
-        if (System.getenv("DB_USER") != null) props.setProperty("da.user", System.getenv("DB_USER"));
+        if (System.getenv("DB_USER") != null) props.setProperty("db.user", System.getenv("DB_USER"));
         if (System.getenv("DB_PASSWORD") != null) props.setProperty("db.password", System.getenv("DB_PASSWORD"));
         if (System.getenv("JWT_SECRET") != null) props.setProperty("jwt.secret", System.getenv("JWT_SECRET"));
         return props;
@@ -43,17 +44,13 @@ public class Database {
 
     public static HikariDataSource getDataSource(){
         if (datasSource == null) {
-            try {
-                Properties props = Database.loadProperties();
-                HikariConfig config = new HikariConfig();
-                config.setJdbcUrl(props.getProperty("db.url"));
-                config.setUsername(props.getProperty("db.user"));
-                config.setPassword(props.getProperty("db.password"));
+            Properties props = Database.loadProperties();
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(props.getProperty("db.url"));
+            config.setUsername(props.getProperty("db.user"));
+            config.setPassword(props.getProperty("db.password"));
 
-                datasSource = new HikariDataSource(config);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            datasSource = new HikariDataSource(config);
         }
         return datasSource;
     }
