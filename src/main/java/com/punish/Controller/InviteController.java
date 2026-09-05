@@ -2,6 +2,7 @@ package com.punish.Controller;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,19 @@ public class InviteController {
             String userRole = ctx.attribute("userRole");
             tournamentService.verificarDono(id, userId, userRole);
 
-            List<TournamentInvite> invites = inviteService.listarConvites(id);
-            ctx.json(invites);
+            List<Map<String, Object>> resp = new ArrayList<>();
+            for (TournamentInvite invite : inviteService.listarConvites(id)) {
+                Map<String, Object> m = new HashMap<>();
+                m.put("id", invite.getId());
+                m.put("codigo", invite.getCodigo());
+                m.put("criadoEm", invite.getCriado_em());
+                m.put("expiraEm", invite.getExpira_em());
+                m.put("usosMax", invite.getUsos_max());
+                m.put("usos", invite.getUsos());
+                m.put("usosDetalhados", inviteService.listarUsos(invite.getId()));
+                resp.add(m);
+            }
+            ctx.json(resp);
         });
 
         app.delete("/tournaments/{id}/invite/{invite_id}", ctx -> {
