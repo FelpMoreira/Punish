@@ -11,3 +11,4 @@
 | 7 | Pool Stage + Bracket | ⏳ |
 | 8 | Double Elimination | ⏳ |
 | 9 | Admin Dashboard (stats + promover role) | 🔄 planejado |
+| 10 | Registro melhorado: confirmação de email + login com Google OAuth | 💡 futuro |
