@@ -12,7 +12,7 @@ public class AdminController {
     PlayerRepository playerRepository = new PlayerRepository();
 
     public void adminRoutes(Javalin app){
-        app.get("/admin/player", ctx -> {
+        app.get("/admin/players", ctx -> {
             List<Player> players = playerRepository.listarTodos();
             ctx.json(players);
         });
@@ -31,7 +31,7 @@ public class AdminController {
                 ctx.status(404).json(Map.of("error", "Jogador não encontrado"));
                 return;
             }
-            playerRepository.atualiazrRole(id, role);
+            playerRepository.atualizarRole(id, role);
             ctx.status(204);
         });
     }

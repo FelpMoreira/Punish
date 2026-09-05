@@ -32,7 +32,7 @@ public class PlayerRepository {
         ) ;
     }
 
-    public void atualiazrRole(Long id, String role){
+    public void atualizarRole(Long id, String role){
         jdbi.withHandle(handle ->
             handle.createUpdate("UPDATE player SET role = :role WHERE id = :id")
             .bind("role", role)
