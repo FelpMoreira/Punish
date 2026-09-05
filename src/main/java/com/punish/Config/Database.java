@@ -34,6 +34,10 @@ public class Database {
             }
             props.load(input);
         }
+        if (System.getenv("DB_URL") != null) props.setProperty("db.url", System.getenv("DB_URL"));
+        if (System.getenv("DB_USER") != null) props.setProperty("da.user", System.getenv("DB_USER"));
+        if (System.getenv("DB_PASSWORD") != null) props.setProperty("db.password", System.getenv("DB_PASSWORD"));
+        if (System.getenv("JWT_SECRET") != null) props.setProperty("jwt.secret", System.getenv("JWT_SECRET"));
         return props;
     }
 
