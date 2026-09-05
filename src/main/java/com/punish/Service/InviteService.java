@@ -2,17 +2,23 @@ package com.punish.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.punish.Exception.ConflictException;
 import com.punish.Exception.NotFoundException;
 import com.punish.Exception.ValidationException;
+import com.punish.Model.Player;
 import com.punish.Model.Tournament;
 import com.punish.Model.TournamentInvite;
+import com.punish.Model.TournamentInviteUsage;
 import com.punish.Model.TournamentRequest;
 import com.punish.Model.Enums.TournamentStatus;
 import com.punish.Repository.TournamentInviteRepository;
+import com.punish.Repository.TournamentInviteUsageRepository;
 import com.punish.Repository.TournamentRequestRepository;
 
 public class InviteService {
@@ -20,6 +26,7 @@ public class InviteService {
     private PlayerService playerService = new PlayerService();
     private TournamentInviteRepository inviteRepository = new TournamentInviteRepository();
     private TournamentRequestRepository requestRepository = new TournamentRequestRepository();
+    private TournamentInviteUsageRepository usageRepository = new TournamentInviteUsageRepository();
 
     public TournamentInvite criarConvite(Long tournamentId, Timestamp expiraEm, Integer usosMax){
         Tournament t = tournamentService.buscarPorId(tournamentId);
@@ -51,6 +58,7 @@ public class InviteService {
         if (invite.getUsos_max() != null && invite.getUsos() >= invite.getUsos_max()) throw new ConflictException("Covite esgotou o limite de usos");
         playerService.adicionarAoTournament(invite.getFk_tournament_id(), userId);
         inviteRepository.incrementarUsos(invite.getId());
+        usageRepository.salvar(invite.getId(), userId);
     }
 
     // pedidos de entrada
@@ -78,5 +86,18 @@ public class InviteService {
         TournamentRequest request = requestRepository.buscar(tournamentId, playerId);
         if (request == null || !"PENDING".equals(request.getStatus())) throw new ConflictException("Pedido não encontrado");
         requestRepository.atualizarStatus(request.getId(), "REJECTED");
+    }
+
+    public List<Map<String, Object>> listarUsos(Long inviteId){
+        List<Map<String, Object>> usos = new ArrayList<>();
+        for (TournamentInviteUsage uso : usageRepository.buscarPorInvite(inviteId)) {
+            Player p = playerService.buscarPorId(uso.getFk_player_id());
+            Map<String, Object> m = new HashMap<>();
+            m.put("playerId", p.getId());
+            m.put("nickname", p.getNickname());
+            m.put("usadoEm", uso.getUsado_em());
+            usos.add(m);
+        }
+        return usos;
     }
 }
