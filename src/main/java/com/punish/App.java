@@ -26,7 +26,7 @@ public class App
                     rule.anyHost();
                 });
             });
-        }).start(7000);
+        }).start(Integer.parseInt(System.getenv().getOrDefault("PORT", "7000")));
 
         javalin.exception(NotFoundException.class, (e, ctx) -> {
             ctx.status(404).json(Map.of("error", e.getMessage()));
