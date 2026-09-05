@@ -1,0 +1,22 @@
+# flyctl launch added from .gitignore
+**/target
+**/.vscode
+**/*.class
+**/*.jar
+**/*.log
+**/.env
+**/db.properties
+**/.DS_Store
+**/*.iml
+**/.idea
+**/src/main/resources/application.propertiesdependency-reduced-pom.xml
+**/dependency-reduced-pom.xml
+**/application.properties
+fly.toml
+**/.git
+**/Obsidian
+**/docs
+**/README.md
+**/schema.sql
+**/PASSO_*.md
+**/*.md
