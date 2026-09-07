@@ -10,5 +10,5 @@
 | 6 | Sistema Suíço | ⏳ |
 | 7 | Pool Stage + Bracket | ⏳ |
 | 8 | Double Elimination | ⏳ |
-| 9 | Admin Dashboard (stats + promover role) | 🔄 planejado |
+| 9 | Admin Dashboard (lista usuários + promover/rebaixar role) | ✅ feito |
 | 10 | Registro melhorado: confirmação de email + login com Google OAuth | 💡 futuro |

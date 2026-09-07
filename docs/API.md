@@ -1,5 +1,20 @@
 ## 📡 API — Endpoints
 
+Base: `https://punish.fly.dev` — autenticação via header `Authorization: Bearer <token>` (exceto rotas públicas).
+Referência usada pelo app mobile (APK).
+
+### Autenticação
+
+| Método | Rota | Corpo/Descrição | Resposta |
+|--------|------|-----------------|----------|
+| POST | `/auth/register` | `{ nickname, email, password }` → `201` | Player |
+| POST | `/auth/login` | `{ email, password }` | `{ token, refreshToken, email }` |
+| POST | `/auth/refresh` | `{ refreshToken }` → renova o par | `{ token, refreshToken }` |
+| POST | `/auth/logout` | `{ refreshToken }` → revoga → `204` | — |
+
+> O `token` (JWT) carrega a `role` do player — após mudança de role é preciso **relogar**.
+> Rotas públicas: `register`, `login`, `refresh`, `logout`.
+
 ### Torneios
 
 | Método | Rota | Descrição |
@@ -14,6 +29,7 @@
 | POST | `/tournaments/{id}/generate` | Gera bracket (chama `start`) → `201` lista de matches |
 | POST | `/tournaments/{id}/recalculate` | Resetar + gerar de novo → `204` |
 | GET | `/tournaments/{id}/ranking` | Ranking por colocação |
+| GET | `/dashboard` | `{ totalPlayers, matchesPlayed, upcomingMatches }` |
 
 ### Players
 
@@ -25,9 +41,16 @@
 | POST | `/tournaments/{id}/players` | Adicionar player `{ playerId }` → `204` |
 | GET | `/tournaments/{id}/players` | Players do torneio |
 | DELETE | `/tournaments/{id}/players/{playerId}` | Remover player do torneio → `204` |
-| DELETE | `/players/{id}` | Deletar player → `204` |
+| DELETE | `/players/{id}` | Deletar player → `204` (exige ORGANIZER/ADMIN) |
 
 > `POST /players` foi **removido** — cadastro agora é via `/auth/register`.
+
+### Admin (somente ADMIN)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/admin/players` | Listar todos os usuários → `[{ id, nickname, email, role }]` |
+| PUT | `/admin/players/{id}/role` | Mudar role. Body: `{ "role": "PLAYER"\|"ORGANIZER"\|"ADMIN" }` → `204` |
 
 ### Partidas
 
@@ -47,8 +70,16 @@
 
 Regras: winner deve ser player1 ou player2; scores ≥ 0; só `READY`/`IN_PROGRESS`. Ao registrar resultado, o vencedor é **automaticamente promovido** para `fk_next_match_win_id`. Se não houver next match, o torneio é finalizado e o campeão salvo.
 
-### Dashboard
+### Invites (convites & pedidos)
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/dashboard` | `{ totalPlayers, matchesPlayed, upcomingMatches }` |
+| POST | `/tournaments/{id}/invite` | Criar convite `{ expiraEm?, usosMax? }` → `201` |
+| GET | `/tournaments/{id}/invite` | Listar convites + usos detalhados (dono) |
+| DELETE | `/tournaments/{id}/invite/{invite_id}` | Revogar convite → `204` |
+| GET | `/invites/{codigo}` | Info pública de um convite → `{ codigo, usosMax, usos, expiraEm, tournamentId, tournamentName }` |
+| POST | `/invites/{codigo}/join` | Entrar no torneio via link (qualquer logado) → `204` |
+| POST | `/tournaments/{id}/requests` | Solicitar entrada → `201` |
+| GET | `/tournaments/{id}/requests` | Listar pedidos (dono) |
+| POST | `/tournaments/{id}/requests/{player_id}/accept` | Aceitar pedido → `204` |
+| POST | `/tournaments/{id}/requests/{player_id}/reject` | Rejeitar pedido → `204` |
