@@ -56,6 +56,10 @@ public class MatchService {
         matchRepository.atualizarNextMatchWin(fk_next_match_win_id, id);
     }
 
+    public void atualizarNextMatchLose(Long fk_next_match_lose_id, Long id){
+        matchRepository.atualizarNextMatchLose(fk_next_match_lose_id, id);
+    }
+
     public void atualizarStatus(String status, Long id){
         matchRepository.atualizarStatus(status, id);
     }
@@ -120,6 +124,21 @@ public class MatchService {
         Match nextAtualizada = matchRepository.buscarPorId(m.getFk_next_match_win_id());
         if (nextAtualizada.getFk_player1_id() != null && nextAtualizada.getFk_player2_id() != null) {
             matchRepository.atualizarStatus("READY", nextAtualizada.getId());
+        }
+
+        Long loserId = fk_winner_id.equals(m.getFk_player1_id()) ? m.getFk_player2_id() : m.getFk_player1_id();
+        if (m.getfk_next_match_lose_id() != null) {
+            Match loserNext = matchRepository.buscarPorId(m.getfk_next_match_lose_id());
+            if (loserNext == null) throw new ConflictException("Match de repescagem não encontrado");
+            if (loserNext.getFk_player1_id() == null) {
+                matchRepository.atualizarPlayer1(loserNext.getId(), loserId);
+            } else if (loserNext.getFk_player2_id() == null) {
+                matchRepository.atualizarPlayer2(loserNext.getId(), loserId);
+            } else throw new ConflictException("Não existe vaga no match de repescagem");
+            Match loserAtualizada = matchRepository.buscarPorId(loserNext.getId());
+            if (loserAtualizada.getFk_player1_id() != null && loserAtualizada.getFk_player2_id() != null) {
+                matchRepository.atualizarStatus("READY", loserAtualizada.getId());
+            }
         }
         
         return matchRepository.buscarPorId(id);
