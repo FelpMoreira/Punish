@@ -9,6 +9,7 @@
 | 5 | Round Robin | ⏳ |
 | 6 | Sistema Suíço | ⏳ |
 | 7 | Pool Stage + Bracket | ⏳ |
-| 8 | Double Elimination | ⏳ |
+| 8 | Double Elimination | 🔄 em andamento |
 | 9 | Admin Dashboard (lista usuários + promover/rebaixar role) | ✅ feito |
 | 10 | Registro melhorado: confirmação de email + login com Google OAuth | 💡 futuro |
+| 11 | Bracket visual (diagrama de árvore) | 🔄 em andamento |
