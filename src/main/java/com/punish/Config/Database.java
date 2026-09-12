@@ -8,6 +8,7 @@ import org.jdbi.v3.core.Jdbi;
 
 import com.punish.Model.Enums.BracketType;
 import com.punish.Model.Enums.MatchStatus;
+import com.punish.Model.Enums.TipoTournament;
 import com.punish.Model.Enums.TournamentStatus;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -22,6 +23,7 @@ public class Database {
             jdbi.registerColumnMapper(TournamentStatus.class, new TournamentStatusMapper());
             jdbi.registerColumnMapper(BracketType.class, (rs, col, ctx) -> BracketType.valueOf(rs.getString(col)));
             jdbi.registerColumnMapper(MatchStatus.class, (rs, col, ctx) -> MatchStatus.valueOf(rs.getString(col)));
+            jdbi.registerColumnMapper(TipoTournament.class, (rs, col, ctx) -> TipoTournament.valueOf(rs.getString(col)));
         }
         return jdbi;
     }
@@ -46,6 +48,7 @@ public class Database {
         if (datasSource == null) {
             Properties props = Database.loadProperties();
             HikariConfig config = new HikariConfig();
+            config.setDriverClassName("org.postgresql.Driver");
             config.setJdbcUrl(props.getProperty("db.url"));
             config.setUsername(props.getProperty("db.user"));
             config.setPassword(props.getProperty("db.password"));

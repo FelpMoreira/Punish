@@ -105,6 +105,15 @@ public class MatchRepository {
         );
     }
 
+    public void atualizarNextMatchLose(Long fk_next_match_lose_id, Long id){
+        jdbi.withHandle(handle -> 
+            handle.createUpdate("UPDATE matches SET fk_next_match_lose_id = :fk_next_match_lose_id WHERE id = :id")
+            .bind("fk_next_match_lose_id", fk_next_match_lose_id)
+            .bind("id", id)
+            .execute()
+        );
+    }
+
     public void atualizarStatus(String status, Long id){
         jdbi.withHandle(handle -> 
             handle.createUpdate("UPDATE matches SET status = :status WHERE id = :id")

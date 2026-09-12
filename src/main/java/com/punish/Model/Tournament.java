@@ -2,6 +2,7 @@ package com.punish.Model;
 
 import java.sql.Timestamp;
 
+import com.punish.Model.Enums.TipoTournament;
 import com.punish.Model.Enums.TournamentStatus;
 
 public class Tournament {
@@ -12,6 +13,7 @@ public class Tournament {
     private Long fk_owner;
     private TournamentStatus status;
     private Timestamp criado_em;
+    private TipoTournament tipo = TipoTournament.SINGLE;
 
     public Tournament () {}
 
@@ -35,4 +37,8 @@ public class Tournament {
 
     public Timestamp getCriado_em() { return criado_em; }
     public void setCriado_em(Timestamp criado_em) { this.criado_em = criado_em; }
+
+    public TipoTournament getTipo() { return tipo; }
+    public void setTipo(TipoTournament tipo) { this.tipo = tipo; }
+    
 }
