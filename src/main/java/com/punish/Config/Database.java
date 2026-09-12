@@ -48,6 +48,7 @@ public class Database {
         if (datasSource == null) {
             Properties props = Database.loadProperties();
             HikariConfig config = new HikariConfig();
+            config.setDriverClassName("org.postgresql.Driver");
             config.setJdbcUrl(props.getProperty("db.url"));
             config.setUsername(props.getProperty("db.user"));
             config.setPassword(props.getProperty("db.password"));
