@@ -59,7 +59,9 @@ public class AuthMiddleware {
             || path.equals("/auth/login")
             || path.equals("/auth/refresh")
             || path.equals("/auth/logout"))) return true;
-        if ("GET".equals(method)) return true;
+        if ("GET".equals(method)
+            && !path.matches("/tournaments/\\d+/invite")
+            && !path.matches("/tournaments/\\d+/request")) return true;
         return false;
     }
 
