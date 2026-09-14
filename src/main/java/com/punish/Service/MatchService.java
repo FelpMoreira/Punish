@@ -144,6 +144,56 @@ public class MatchService {
         return matchRepository.buscarPorId(id);
     }
 
+    public void colocarJogador(Long alvoId, Long playerId) {
+        Match alvo = matchRepository.buscarPorId(alvoId);
+        if (alvo.getFk_player1_id() == null) {
+            matchRepository.atualizarPlayer1(alvoId, playerId);
+        } else if (alvo.getFk_player2_id() == null) {
+            matchRepository.atualizarPlayer2(alvoId, playerId);
+        } else {
+            throw new ConflictException("Não existe vaga nessa partida");
+        }
+        Match alvoAtualizada = matchRepository.buscarPorId(alvoId);
+        if (alvoAtualizada.getFk_player1_id() != null && alvoAtualizada.getFk_player2_id() != null) {
+            matchRepository.atualizarStatus("READY", alvoAtualizada.getId());
+        }
+    }
+
+    public void conferirSeCompletou(Long alvoId, Long tournamenteId){
+        if (alvoId == null) return;
+        Match alvo = matchRepository.buscarPorId(alvoId);
+        // GF nunca sofre W/O automatico
+        if (alvo == null || "GRAND_FINAL".equals(alvo.getBracket_type())) return;
+
+        List<Match> all = matchRepository.buscarPorTournament(tournamenteId);
+        boolean todasFontes = all.stream()
+            .filter(x -> alvo.getId().equals(x.getFk_winner_id())
+                      || alvo.getId().equals(x.getfk_next_match_lose_id()))
+            .allMatch(x -> "FINISHED".equals(x.getStatus()));
+        if (!todasFontes) return; // ainda vai chegar jogando
+
+        Long p1 = alvo.getFk_player1_id();
+        Long p2 = alvo.getFk_player2_id();
+
+        if (p1 != null && p2 != null) { 
+            atualizarStatus("READY", alvo.getId()); 
+            return; 
+        }
+        if (p1 != null || p2 != null) { // 1 jogador -> W/O, promove e desce a "cascata"
+            Long winner = p1 != null ? p1 : p2;
+            atualizarVencedor(alvo.getId(), winner, 0, 0);
+            if (alvo.getFk_next_match_win_id() != null) {
+                colocarJogador(alvo.getFk_next_match_win_id(), winner);
+                conferirSeCompletou(alvo.getFk_next_match_win_id(), tournamenteId);
+            }
+            return;
+        }
+        matchRepository.atualizarStatus("FINISHED", alvo.getId());
+        if (alvo.getFk_next_match_win_id() != null) {
+            conferirSeCompletou(alvo.getFk_next_match_win_id(), tournamenteId);
+        }
+    }
+
     public void deletarPorTournament(Long id){
         matchRepository.deletarPorTournament(id);
     }
