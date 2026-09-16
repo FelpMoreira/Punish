@@ -132,7 +132,7 @@ public class BracketService {
         return matches;
     }
 
-    public List<Match> gerarBracketDoubleEliminitaion(Long tournament_id, List<Player> players) {
+    public List<Match> gerarBracketDoubleElimination(Long tournament_id, List<Player> players) {
         Collections.shuffle(players);
         int tamanho_bracket = calcularTamanhoBracket(players.size());
         int byes = tamanho_bracket - players.size();
