@@ -89,58 +89,61 @@ public class MatchService {
     }
 
     public Match registrarResultado(Long id, Long fk_winner_id, Integer score_player1, Integer score_player2){
-        if(score_player1 != null && score_player1 < 0) throw new ValidationException("Placar não pode ser negativo");
-        if(score_player2 != null && score_player2 < 0) throw new ValidationException("Placar não pode ser negativo");
+        if (score_player1 != null && score_player1 < 0) throw new ValidationException("Placar não pode ser negativo");
+        if (score_player2 != null && score_player2 < 0) throw new ValidationException("Placar não pode ser negativo");
         Match m = matchRepository.buscarPorId(id);
         if (m == null) throw new NotFoundException("Partida não encontrada");
-        if (!"READY".equals(m.getStatus()) && !"IN_PROGRESS".equals(m.getStatus())){
-            throw new ConflictException("Partida não está em andamento");
-        }
-        if (fk_winner_id == null) {
-            throw new ValidationException("Vencedor não informado");
-        }
-        if (!fk_winner_id.equals(m.getFk_player1_id()) && !fk_winner_id.equals(m.getFk_player2_id())) {
-            throw new ValidationException("Vencedor inválido");
-        }
+        if (!"READY".equals(m.getStatus()) && !"IN_PROGRESS".equals(m.getStatus())) throw new ConflictException("Partida em andamento");
+        if (fk_winner_id == null) throw new ValidationException("Vencedor não informado");
+        if (!fk_winner_id.equals(m.getFk_player1_id()) && !fk_winner_id.equals(m.getFk_player2_id())) throw new ValidationException("Vencedor inválido");
         matchRepository.atualizarVencedor(id, fk_winner_id, score_player1, score_player2);
-        Long nextMatchId = m.getFk_next_match_win_id();
-        Match next_match = null;
-        if (nextMatchId != null) {
-            next_match = matchRepository.buscarPorId(nextMatchId);
-        }
-        if (next_match == null) {
+
+        if ("GRAND_FINAL".equals(m.getBracket_type()) && m.getFk_next_match_win_id() == null) {
+            List<Match> all = matchRepository.buscarPorTournament(m.getFk_tournament_id());
+            Match lbFinal = all.stream()
+                .filter(x -> "LOSERS".equals(x.getBracket_type())
+                        && m.getId().equals(x.getFk_next_match_win_id()))
+                .findFirst().orElse(null);
+            if (lbFinal != null) {
+                if (fk_winner_id.equals(lbFinal.getFk_winner_id())) {
+                    Match gf2 = new Match();
+                    gf2.setFk_tournament_id(m.getFk_tournament_id());
+                    gf2.setRound_number(m.getRound_number() + 1);
+                    gf2.setMatch_number(0);
+                    gf2.setBracket_type("GRAND_FINAL");
+                    gf2.setStatus("WAITING");
+                    gf2.setFk_player1_id(m.getFk_player1_id());
+                    gf2.setFk_player2_id(m.getFk_player2_id());
+                    gf2 = matchRepository.criar(gf2);
+                    matchRepository.atualizarStatus("READY", gf2.getId());
+                    matchRepository.atualizarNextMatchWin(gf2.getId(), m.getId());
+                    matchRepository.atualizarNextMatchLose(gf2.getId(), m.getId());
+                } else {
+                    tournamentRepository.atualizarCampeao(m.getFk_tournament_id(), fk_winner_id);
+                    tournamentRepository.atualizarStatus(m.getFk_tournament_id(), "FINISHED");
+                }
+                return matchRepository.buscarPorId(id);
+            }   
             tournamentRepository.atualizarCampeao(m.getFk_tournament_id(), fk_winner_id);
             tournamentRepository.atualizarStatus(m.getFk_tournament_id(), "FINISHED");
             return matchRepository.buscarPorId(id);
         }
-        if (next_match.getFk_player1_id() == null) {
-            matchRepository.atualizarPlayer1(m.getFk_next_match_win_id(), fk_winner_id);
-        } else if (next_match.getFk_player2_id() == null) {
-            matchRepository.atualizarPlayer2(m.getFk_next_match_win_id(), fk_winner_id);
-        } else {
-            throw new ConflictException("Não existe vaga nessa partida");
+        Long nextMatchId = m.getFk_next_match_win_id();
+        if (nextMatchId == null) {
+            tournamentRepository.atualizarCampeao(m.getFk_tournament_id(), fk_winner_id);
+            tournamentRepository.atualizarStatus(m.getFk_tournament_id(), "FINISHED");
+            return matchRepository.buscarPorId(id);
         }
-
-        Match nextAtualizada = matchRepository.buscarPorId(m.getFk_next_match_win_id());
-        if (nextAtualizada.getFk_player1_id() != null && nextAtualizada.getFk_player2_id() != null) {
-            matchRepository.atualizarStatus("READY", nextAtualizada.getId());
-        }
+        colocarJogador(nextMatchId, fk_winner_id);
 
         Long loserId = fk_winner_id.equals(m.getFk_player1_id()) ? m.getFk_player2_id() : m.getFk_player1_id();
         if (m.getfk_next_match_lose_id() != null) {
-            Match loserNext = matchRepository.buscarPorId(m.getfk_next_match_lose_id());
-            if (loserNext == null) throw new ConflictException("Match de repescagem não encontrado");
-            if (loserNext.getFk_player1_id() == null) {
-                matchRepository.atualizarPlayer1(loserNext.getId(), loserId);
-            } else if (loserNext.getFk_player2_id() == null) {
-                matchRepository.atualizarPlayer2(loserNext.getId(), loserId);
-            } else throw new ConflictException("Não existe vaga no match de repescagem");
-            Match loserAtualizada = matchRepository.buscarPorId(loserNext.getId());
-            if (loserAtualizada.getFk_player1_id() != null && loserAtualizada.getFk_player2_id() != null) {
-                matchRepository.atualizarStatus("READY", loserAtualizada.getId());
-            }
+            colocarJogador(m.getfk_next_match_lose_id(), loserId);
         }
-        
+
+        conferirSeCompletou(nextMatchId, m.getFk_tournament_id());
+        conferirSeCompletou(m.getfk_next_match_lose_id(), m.getFk_tournament_id());
+
         return matchRepository.buscarPorId(id);
     }
 
@@ -167,7 +170,7 @@ public class MatchService {
 
         List<Match> all = matchRepository.buscarPorTournament(tournamenteId);
         boolean todasFontes = all.stream()
-            .filter(x -> alvo.getId().equals(x.getFk_winner_id())
+            .filter(x -> alvo.getId().equals(x.getFk_next_match_win_id())
                       || alvo.getId().equals(x.getfk_next_match_lose_id()))
             .allMatch(x -> "FINISHED".equals(x.getStatus()));
         if (!todasFontes) return; // ainda vai chegar jogando
