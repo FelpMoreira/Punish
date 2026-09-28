@@ -3,6 +3,7 @@ package com.punish.Controller;
 import java.util.List;
 
 import com.punish.Model.Tournament;
+import com.punish.Model.Enums.TipoTournament;
 import com.punish.Service.TournamentService;
 
 import com.punish.Model.Match;
@@ -63,7 +64,8 @@ public class TournamentController {
             Tournament t = tournamentService.criarTournament(
                 body.getName(),
                 body.getGame(),
-                userId
+                userId,
+                body.getTipo()
             );
             ctx.status(201).json(t);
         });
@@ -122,8 +124,11 @@ public class TournamentController {
                 userRole
             );
             tournamentService.start(id);
+            Tournament t = tournamentService.buscarPorId(id);
             List<Player> players = playerService.buscarPlayersDoTournament(id);
-            List<Match> matches = bracketService.gerarBracket(id, players);
+            List<Match> matches = TipoTournament.DOUBLE.equals(t.getTipo())
+                ? bracketService.gerarBracketDoubleElimination(id, players)
+                : bracketService.gerarBracket(id, players);
             ctx.status(201).json(matches);
         });
 
