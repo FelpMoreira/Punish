@@ -7,17 +7,19 @@ import org.jdbi.v3.core.Jdbi;
 
 import com.punish.Config.Database;
 import com.punish.Model.Tournament;
+import com.punish.Model.Enums.TipoTournament;
 
 public class TournamentRepository {
     Jdbi jdbi = Database.getJdbi();
-    public Tournament criarTournament(String name, String game, Long fk_owner){ 
+    public Tournament criarTournament(String name, String game, Long fk_owner, TipoTournament tipo){ 
         Long id = jdbi.withHandle(handle -> {
             return handle.createUpdate("""
-                INSERT INTO tournament (name, game, fk_owner) VALUES (:name, :game, :fk_owner)
+                INSERT INTO tournament (name, game, fk_owner, tipo) VALUES (:name, :game, :fk_owner, :tipo)
             """)
             .bind("name", name)
             .bind("game", game)
             .bind("fk_owner", fk_owner)
+            .bind("tipo", tipo)
             .executeAndReturnGeneratedKeys("id")
             .mapTo(Long.class)
             .findOne()
