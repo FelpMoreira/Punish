@@ -7,6 +7,7 @@ import com.punish.Exception.NotFoundException;
 import com.punish.Exception.ValidationException;
 import com.punish.Model.PaginaResult;
 import com.punish.Model.Tournament;
+import com.punish.Model.Enums.TipoTournament;
 import com.punish.Model.Enums.TournamentStatus;
 import com.punish.Repository.TournamentRepository;
 
@@ -14,13 +15,14 @@ public class TournamentService {
     TournamentRepository tournamentRepository = new TournamentRepository();
     MatchService matchService = new MatchService();
 
-    public Tournament criarTournament(String name, String game, Long fk_owner){
+    public Tournament criarTournament(String name, String game, Long fk_owner, TipoTournament tipo){
         if(name == null || name.isBlank()) throw new ValidationException("Nome é obrigatório");
         if(name.length() > 100) throw new ValidationException("Nome muito longo");
         if(game == null || game.isBlank()) throw new ValidationException("Jogo é obrigatório");
         if(game.length() > 50) throw new ValidationException("Nome do jogo muito longo");
         if(fk_owner == null) throw new ValidationException("Dono do torneio é obrigatório");
-        return tournamentRepository.criarTournament(name, game, fk_owner);
+        if(tipo == null) tipo = TipoTournament.SINGLE;
+        return tournamentRepository.criarTournament(name, game, fk_owner, tipo);
     }
 
     public void verificarDono(Long tournamentId, Long userId, String userRole){
