@@ -8,6 +8,8 @@ db.properties
 .DS_Store
 *.iml
 .idea/
-src/main/resources/application.propertiesdependency-reduced-pom.xml
+src/main/resources/application.properties
 dependency-reduced-pom.xml
 application.properties
+application-*.properties
+db.properties
