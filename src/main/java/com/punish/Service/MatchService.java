@@ -20,10 +20,15 @@ public class MatchService {
     }
 
     public List<Match> iniciarRodada(Long fk_tournament_id, int fk_round_number){
+        return iniciarRodada(fk_tournament_id, fk_round_number, null);
+    }
+
+    public List<Match> iniciarRodada(Long fk_tournament_id, int fk_round_number, String bracketType){
         List<Match> all = matchRepository.buscarPorTournament(fk_tournament_id);
         List<Match> started = new ArrayList<>();
         for (Match m : all) {
             if (m.getRound_number() == fk_round_number
+                    && (bracketType == null || bracketType.equals(m.getBracket_type()))
                     && "READY".equals(m.getStatus())
                     && m.getFk_player1_id() != null
                     && m.getFk_player2_id() != null) {
