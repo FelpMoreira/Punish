@@ -237,8 +237,13 @@ public class BracketService {
                 matchService.atualizarPlayer1(match.getId(), p1.getId());
                 matchService.atualizarVencedor(match.getId(), p1.getId(), 0, 0);
                 Match prox = wb.get(1).get(match.getMatch_number() / 2);
-                if (prox.getFk_player1_id() == null) matchService.atualizarPlayer1(prox.getId(), p1.getId());
-                else matchService.atualizarPlayer2(prox.getId(), p1.getId());
+                if (prox.getFk_player1_id() == null) {
+                    matchService.atualizarPlayer1(prox.getId(), p1.getId());
+                    prox.setFk_player1_id(p1.getId());
+                } else {
+                    matchService.atualizarPlayer2(prox.getId(), p1.getId());
+                    prox.setFk_player2_id(p1.getId());
+                }
             } else {
                 matchService.atualizarStatus("FINISHED", match.getId());
             }
