@@ -123,9 +123,10 @@ public class TournamentController {
                 userId,
                 userRole
             );
-            tournamentService.start(id);
             Tournament t = tournamentService.buscarPorId(id);
             List<Player> players = playerService.buscarPlayersDoTournament(id);
+            tournamentService.validarJogadoresParaGerar(players.size());
+            tournamentService.start(id);
             List<Match> matches = TipoTournament.DOUBLE.equals(t.getTipo())
                 ? bracketService.gerarBracketDoubleElimination(id, players)
                 : bracketService.gerarBracket(id, players);
