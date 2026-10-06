@@ -97,6 +97,10 @@ public class TournamentService {
         tournamentRepository.atualizarStatus(id, "CREATED");
     }
 
+    public void validarJogadoresParaGerar(int quantidade){
+        if (quantidade < 2) throw new ValidationException("É necessário pelo menos 2 jogadores para gerar o chaveamento");
+    }
+
     public void deletar(Long id){
         buscarPorId(id);
         tournamentRepository.deletar(id);
