@@ -1,6 +1,7 @@
 package com.punish.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 import com.punish.Model.Match;
 import com.punish.Model.ResultadoRequest;
@@ -87,8 +88,9 @@ public class MatchController {
                 userId,
                 userRole
             );
-            var body = ctx.bodyAsClass(java.util.Map.class);
+            var body = ctx.bodyAsClass(Map.class);
             int round = ((Number) body.get("round")).intValue();
+            String bracketType = body.get("bracketType") != null ? body.get("bracketType").toString() : null;
             var started = matchService.iniciarRodada(tournamentId, round);
             ctx.json(started);
         });
