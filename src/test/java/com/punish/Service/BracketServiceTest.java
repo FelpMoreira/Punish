@@ -12,6 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.punish.Model.Match;
@@ -24,6 +28,16 @@ public class BracketServiceTest {
     
     @InjectMocks
     BracketService bracketService;
+
+    private void stubCriacao(List<Match> criados) {
+        AtomicLong counter = new AtomicLong(0);
+        when(matchService.criar(any())).thenAnswer(invocation -> {
+            Match m = invocation.getArgument(0);
+            m.setId(counter.incrementAndGet());
+            criados.add(m);
+            return m;
+        });
+    }
     
     @Test
     void deveCalcularTotalDeMatchesCom4Jogadores(){
@@ -81,5 +95,56 @@ public class BracketServiceTest {
 
         // assert
         assertThat(matches).hasSize(7);
+    }
+
+    @Test
+    void deveGerar14MatchesPara6JogadoresEmDoubleElim(){
+        List<Player> players = jogadores(6);
+        List<Match> criados = new ArrayList<>();
+        stubCriacao(criados);
+        when(matchService.buscarPorTournament(anyLong())).thenReturn(criados);
+
+        List<Match> matches = bracketService.gerarBracketDoubleElimination(1L, players);
+
+        assertThat(matches).hasSize(14);
+        assertThat(matches.stream().filter(m -> "WINNERS".equals(m.getBracket_type()))).hasSize(7);
+        assertThat(matches.stream().filter(m -> "LOSERS".equals(m.getBracket_type()))).hasSize(6);
+        assertThat(matches.stream().filter(m -> "GRAND_FINAL".equals(m.getBracket_type()))).hasSize(1);
+    }
+
+    @Test
+    void devePropagarOsDoisByesParaASegundaRodadaSemSobrescrever(){
+        List<Player> players = jogadores(6);
+        List<Match> criados = new ArrayList<>();
+        stubCriacao(criados);
+        when(matchService.buscarPorTournament(anyLong())).thenReturn(criados);
+
+        List<Match> matches = bracketService.gerarBracketDoubleElimination(1L, players);
+
+        Match r2 = matches.stream()
+            .filter(m -> "WINNERS".equals(m.getBracket_type()) && m.getRound_number() == 2 && m.getMatch_number() == 0)
+            .findFirst().orElseThrow();
+
+        assertThat(r2.getFk_player1_id()).isNotNull();
+        assertThat(r2.getFk_player2_id()).isNotNull();
+        assertThat(r2.getFk_player1_id()).isNotEqualTo(r2.getFk_player2_id());
+    }
+
+    @Test 
+    void deveAplicarWalkoverNosDoisByesDaPrimeiraRodada() {
+        List<Player> players = jogadores(6);
+        List<Match> criados = new ArrayList<>();
+        stubCriacao(criados);
+        when(matchService.buscarPorTournament(anyLong())).thenReturn(criados);
+
+        bracketService.gerarBracketDoubleElimination(1L, players);
+
+        verify(matchService, times(2)).atualizarVencedor(anyLong(), anyLong(), eq(0), eq(0));
+    }
+
+    private List<Player> jogadores(int n) {
+        List<Player> players = new ArrayList<>();
+        for (int i = 0; i < n; i++) players.add(new Player((long) i));
+        return players;
     }
 }
