@@ -1,5 +1,6 @@
 package com.punish.Repository;
 
+import java.sql.Types;
 import java.util.List;
 
 import org.jdbi.v3.core.Jdbi;
@@ -46,35 +47,30 @@ public class MatchRepository {
 
     public List<Match> buscarComFiltros(Long playerId, Long tournamentId, int page, int size) {
         int offset = (page - 1) * size;
-        return jdbi.withHandle(handle ->
-            handle.createQuery("""
+        return jdbi.withHandle(handle -> {
+            var query = handle.createQuery("""
                 SELECT * FROM matches WHERE 1=1
                 AND (:playerId IS NULL OR fk_player1_id = :playerId OR fk_player2_id = :playerId)
                 AND (:tournamentId IS NULL OR fk_tournament_id = :tournamentId)
                 LIMIT :size OFFSET :offset
-            """)
-            .bind("playerId", playerId)
-            .bind("tournamentId", tournamentId)
-            .bind("size", size)
-            .bind("offset", offset)
-            .mapToBean(Match.class)
-            .list()
-        );
+            """);
+            bindId(query, "playerId", playerId);
+            bindId(query, "tournamentId", tournamentId);
+            return query.bind("size", size).bind("offset", offset).mapToBean(Match.class).list();
+        });
     }
 
-    public long contarTotal(long playerId, long tournamentId){
-        return jdbi.withHandle(handle -> 
-            handle.createQuery("""
+    public long contarTotal(Long playerId, Long tournamentId){
+        return jdbi.withHandle(handle -> {
+            var query = handle.createQuery("""
                 SELECT COUNT(*) FROM matches WHERE 1=1
                 AND (:playerId IS NULL OR fk_player1_id = :playerId OR fk_player2_id = :playerId)
                 AND (:tournamentId IS NULL OR fk_tournament_id = :tournamentId)
-            """)
-            .bind("playerId", playerId)
-            .bind("tournamentId", tournamentId)
-            .mapTo(Long.class)
-            .findOne()
-            .orElse(0L)
-        );
+            """);
+            bindId(query, "playerId", playerId);
+            bindId(query, "tournamentId", tournamentId);
+            return query.mapTo(Long.class).findOne().orElse(0L);
+        });
     }
 
     public void deletarPorTournament(Long fk_tournament_id){
@@ -149,5 +145,10 @@ public class MatchRepository {
             .bind("id", id)
             .execute()
         );
+    }
+
+    private void bindId(org.jdbi.v3.core.statement.Query query, String name, Long value){
+        if (value == null) query.bindNull(name, Types.BIGINT);
+        else query.bind(name, value);
     }
 }
