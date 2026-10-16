@@ -27,7 +27,7 @@ public class App
                     rule.anyHost();
                 });
             });
-        }).start(Integer.parseInt(System.getenv().getOrDefault("PORT", "7000")));
+        });
 
         javalin.exception(NotFoundException.class, (e, ctx) -> {
             ctx.status(404).json(Map.of("error", e.getMessage()));
@@ -54,5 +54,7 @@ public class App
         new TournamentController().tournamentRoutes(javalin);
         new AuthController().authRoutes(javalin);
         new InviteController().inviteRoutes(javalin);
+        
+        javalin.start(Integer.parseInt(System.getenv().getOrDefault("PORT", "7000")));
     }
 }
