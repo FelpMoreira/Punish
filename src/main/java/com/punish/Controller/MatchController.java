@@ -91,7 +91,7 @@ public class MatchController {
             var body = ctx.bodyAsClass(Map.class);
             int round = ((Number) body.get("round")).intValue();
             String bracketType = body.get("bracketType") != null ? body.get("bracketType").toString() : null;
-            var started = matchService.iniciarRodada(tournamentId, round);
+            var started = matchService.iniciarRodada(tournamentId, round, bracketType);
             ctx.json(started);
         });
     }
